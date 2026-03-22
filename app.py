@@ -260,6 +260,31 @@ def calculate_rsi(series, period=14):
     return rsi
 
 
+def calculate_atr(hist, period=14):
+    if hist.empty:
+        return pd.Series(dtype=float)
+
+    high_low = hist["High"] - hist["Low"]
+    high_close = (hist["High"] - hist["Close"].shift(1)).abs()
+    low_close = (hist["Low"] - hist["Close"].shift(1)).abs()
+    true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    return true_range.rolling(window=period).mean()
+
+
+def calculate_stochastic(hist, period=14, smooth_k=3, smooth_d=3):
+    if hist.empty:
+        empty = pd.Series(dtype=float)
+        return empty, empty
+
+    lowest_low = hist["Low"].rolling(window=period).min()
+    highest_high = hist["High"].rolling(window=period).max()
+    denominator = (highest_high - lowest_low).replace(0, pd.NA)
+    raw_k = ((hist["Close"] - lowest_low) / denominator) * 100
+    stoch_k = raw_k.rolling(window=smooth_k).mean()
+    stoch_d = stoch_k.rolling(window=smooth_d).mean()
+    return stoch_k, stoch_d
+
+
 def clean_company_name(name):
     if not name:
         return ""
@@ -453,6 +478,132 @@ def safe_get_sector(info):
         return quote_type
 
     return "N/A"
+
+
+def safe_get_beta(info):
+    beta = info.get("beta")
+    if isinstance(beta, (int, float)):
+        return round(beta, 2)
+    return "N/A"
+
+
+def safe_get_average_volume(info, fast_info):
+    avg_volume = info.get("averageVolume") or info.get("averageVolume10days")
+
+    if not isinstance(avg_volume, (int, float)):
+        avg_volume = fast_info.get("ten_day_average_volume")
+
+    if isinstance(avg_volume, (int, float)):
+        return avg_volume
+
+    return None
+
+
+def safe_get_52_week_range(info, hist_6mo, current_price):
+    week_high = info.get("fiftyTwoWeekHigh")
+    week_low = info.get("fiftyTwoWeekLow")
+
+    if not isinstance(week_high, (int, float)):
+        if not hist_6mo.empty:
+            week_high = safe_float(hist_6mo["High"].max(), None)
+
+    if not isinstance(week_low, (int, float)):
+        if not hist_6mo.empty:
+            week_low = safe_float(hist_6mo["Low"].min(), None)
+
+    position_pct = "N/A"
+    if isinstance(week_high, (int, float)) and isinstance(week_low, (int, float)) and week_high > week_low:
+        position_pct = round(((current_price - week_low) / (week_high - week_low)) * 100, 2)
+
+    return (
+        round(week_low, 2) if isinstance(week_low, (int, float)) else "N/A",
+        round(week_high, 2) if isinstance(week_high, (int, float)) else "N/A",
+        position_pct
+    )
+
+
+def build_trade_setup(data, news):
+    score = 50
+
+    rsi = data.get("rsi")
+    price = safe_float(data.get("price"), 0)
+    ma20 = data.get("ma20")
+    macd_status = str(data.get("macd_status", ""))
+    signal = str(data.get("signal", ""))
+    news_sentiment = detect_news_sentiment(news)
+
+    if isinstance(ma20, (int, float)):
+        score += 8 if price > ma20 else -8
+
+    if isinstance(rsi, (int, float)):
+        if 50 <= rsi <= 68:
+            score += 10
+        elif rsi >= 70:
+            score -= 8
+        elif rsi <= 30:
+            score += 4
+        else:
+            score -= 4
+
+    if "Bullish" in macd_status:
+        score += 12
+    elif "Bearish" in macd_status:
+        score -= 12
+
+    if "Buy" in signal or "Bullish" in signal:
+        score += 12
+    elif "Sell" in signal or "Bearish" in signal or "Caution" in signal:
+        score -= 12
+
+    if news_sentiment == "Positive":
+        score += 8
+    elif news_sentiment == "Negative":
+        score -= 8
+
+    score = max(0, min(100, score))
+
+    if score >= 72:
+        label = "Strong Setup"
+    elif score >= 58:
+        label = "Constructive"
+    elif score >= 42:
+        label = "Balanced"
+    else:
+        label = "High Risk"
+
+    return score, label, news_sentiment
+
+
+def build_trade_checklist(price, ema20, ema50, rsi, macd_status, stoch_k, stoch_d, volume_vs_avg):
+    checklist = []
+
+    checklist.append({
+        "label": "Price above EMA20",
+        "status": isinstance(ema20, (int, float)) and price > ema20
+    })
+    checklist.append({
+        "label": "EMA20 above EMA50",
+        "status": isinstance(ema20, (int, float)) and isinstance(ema50, (int, float)) and ema20 > ema50
+    })
+    checklist.append({
+        "label": "RSI above 50",
+        "status": isinstance(rsi, (int, float)) and rsi > 50
+    })
+    checklist.append({
+        "label": "MACD bullish",
+        "status": "Bullish" in str(macd_status)
+    })
+    checklist.append({
+        "label": "Stochastic K above D",
+        "status": isinstance(stoch_k, (int, float)) and isinstance(stoch_d, (int, float)) and stoch_k > stoch_d
+    })
+    checklist.append({
+        "label": "Volume above average",
+        "status": isinstance(volume_vs_avg, (int, float)) and volume_vs_avg >= 100
+    })
+
+    passed = sum(1 for item in checklist if item["status"])
+    return checklist, passed
 
 
 def detect_currency(symbol, info, fast_info):
@@ -774,9 +925,18 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
 
     latest_rsi = "N/A"
     latest_ma20 = "N/A"
+    latest_ema20 = "N/A"
+    latest_ema50 = "N/A"
     latest_macd = "N/A"
     latest_signal_line = "N/A"
     macd_status = "N/A"
+    latest_atr = "N/A"
+    latest_stoch_k = "N/A"
+    latest_stoch_d = "N/A"
+    latest_bb_upper = "N/A"
+    latest_bb_middle = "N/A"
+    latest_bb_lower = "N/A"
+    bb_position = "N/A"
 
     chart_labels = []
     chart_prices = []
@@ -784,6 +944,13 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     volume_colors = []
     macd_values = []
     signal_values = []
+    stoch_k_values = []
+    stoch_d_values = []
+    ema20_values = []
+    ema50_values = []
+    bb_upper_values = []
+    bb_middle_values = []
+    bb_lower_values = []
     candle_data = []
     support_levels = []
     resistance_levels = []
@@ -816,17 +983,39 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
 
         ema12_main = hist_main["Close"].ewm(span=12, adjust=False).mean()
         ema26_main = hist_main["Close"].ewm(span=26, adjust=False).mean()
+        hist_main["EMA20"] = hist_main["Close"].ewm(span=20, adjust=False).mean()
+        hist_main["EMA50"] = hist_main["Close"].ewm(span=50, adjust=False).mean()
+        hist_main["BB_MIDDLE"] = hist_main["Close"].rolling(window=20).mean()
+        bb_std = hist_main["Close"].rolling(window=20).std()
+        hist_main["BB_UPPER"] = hist_main["BB_MIDDLE"] + (bb_std * 2)
+        hist_main["BB_LOWER"] = hist_main["BB_MIDDLE"] - (bb_std * 2)
+        stoch_k_main, stoch_d_main = calculate_stochastic(hist_main)
         hist_main["MACD"] = ema12_main - ema26_main
         hist_main["SignalLine"] = hist_main["MACD"].ewm(span=9, adjust=False).mean()
 
         macd_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["MACD"].tolist()]
         signal_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["SignalLine"].tolist()]
+        ema20_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["EMA20"].tolist()]
+        ema50_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["EMA50"].tolist()]
+        bb_upper_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["BB_UPPER"].tolist()]
+        bb_middle_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["BB_MIDDLE"].tolist()]
+        bb_lower_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in hist_main["BB_LOWER"].tolist()]
+        stoch_k_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in stoch_k_main.tolist()]
+        stoch_d_values = [round(safe_float(v), 2) if pd.notna(v) else None for v in stoch_d_main.tolist()]
 
     if not hist_6mo.empty:
         hist_6mo = hist_6mo.copy()
 
         hist_6mo["RSI"] = calculate_rsi(hist_6mo["Close"])
         hist_6mo["MA20"] = hist_6mo["Close"].rolling(window=20).mean()
+        hist_6mo["EMA20"] = hist_6mo["Close"].ewm(span=20, adjust=False).mean()
+        hist_6mo["EMA50"] = hist_6mo["Close"].ewm(span=50, adjust=False).mean()
+        hist_6mo["ATR"] = calculate_atr(hist_6mo)
+        hist_6mo["BB_MIDDLE"] = hist_6mo["Close"].rolling(window=20).mean()
+        bb_std_6mo = hist_6mo["Close"].rolling(window=20).std()
+        hist_6mo["BB_UPPER"] = hist_6mo["BB_MIDDLE"] + (bb_std_6mo * 2)
+        hist_6mo["BB_LOWER"] = hist_6mo["BB_MIDDLE"] - (bb_std_6mo * 2)
+        hist_6mo["STOCH_K"], hist_6mo["STOCH_D"] = calculate_stochastic(hist_6mo)
 
         ema12 = hist_6mo["Close"].ewm(span=12, adjust=False).mean()
         ema26 = hist_6mo["Close"].ewm(span=26, adjust=False).mean()
@@ -835,13 +1024,37 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
 
         latest_rsi = hist_6mo["RSI"].iloc[-1]
         latest_ma20 = hist_6mo["MA20"].iloc[-1]
+        latest_ema20 = hist_6mo["EMA20"].iloc[-1]
+        latest_ema50 = hist_6mo["EMA50"].iloc[-1]
         latest_macd = hist_6mo["MACD"].iloc[-1]
         latest_signal_line = hist_6mo["SignalLine"].iloc[-1]
+        latest_atr = hist_6mo["ATR"].iloc[-1]
+        latest_stoch_k = hist_6mo["STOCH_K"].iloc[-1]
+        latest_stoch_d = hist_6mo["STOCH_D"].iloc[-1]
+        latest_bb_upper = hist_6mo["BB_UPPER"].iloc[-1]
+        latest_bb_middle = hist_6mo["BB_MIDDLE"].iloc[-1]
+        latest_bb_lower = hist_6mo["BB_LOWER"].iloc[-1]
 
         latest_rsi = "N/A" if pd.isna(latest_rsi) else round(float(latest_rsi), 2)
         latest_ma20 = "N/A" if pd.isna(latest_ma20) else round(float(latest_ma20), 2)
+        latest_ema20 = "N/A" if pd.isna(latest_ema20) else round(float(latest_ema20), 2)
+        latest_ema50 = "N/A" if pd.isna(latest_ema50) else round(float(latest_ema50), 2)
         latest_macd = "N/A" if pd.isna(latest_macd) else round(float(latest_macd), 2)
         latest_signal_line = "N/A" if pd.isna(latest_signal_line) else round(float(latest_signal_line), 2)
+        latest_atr = "N/A" if pd.isna(latest_atr) else round(float(latest_atr), 2)
+        latest_stoch_k = "N/A" if pd.isna(latest_stoch_k) else round(float(latest_stoch_k), 2)
+        latest_stoch_d = "N/A" if pd.isna(latest_stoch_d) else round(float(latest_stoch_d), 2)
+        latest_bb_upper = "N/A" if pd.isna(latest_bb_upper) else round(float(latest_bb_upper), 2)
+        latest_bb_middle = "N/A" if pd.isna(latest_bb_middle) else round(float(latest_bb_middle), 2)
+        latest_bb_lower = "N/A" if pd.isna(latest_bb_lower) else round(float(latest_bb_lower), 2)
+
+        if isinstance(latest_bb_upper, (int, float)) and isinstance(latest_bb_lower, (int, float)):
+            if current_price >= latest_bb_upper:
+                bb_position = "Above Upper Band"
+            elif current_price <= latest_bb_lower:
+                bb_position = "Below Lower Band"
+            else:
+                bb_position = "Inside Bands"
 
         if isinstance(latest_macd, (int, float)) and isinstance(latest_signal_line, (int, float)):
             if latest_macd > latest_signal_line:
@@ -857,6 +1070,9 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     market_cap = safe_get_market_cap(info, fast_info)
     pe_ratio = safe_get_pe_ratio(info)
     currency = detect_currency(symbol, info, fast_info)
+    beta = safe_get_beta(info)
+    average_volume_raw = safe_get_average_volume(info, fast_info)
+    week_low, week_high, price_position_52w = safe_get_52_week_range(info, hist_6mo, current_price)
 
     signal = "Neutral"
     signal_reason = "Indicators are mixed"
@@ -890,6 +1106,40 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     clean_name = clean_company_name(company_name)
     news = get_stock_news(clean_name, symbol, stock=stock)
 
+    volume_vs_avg = "N/A"
+    volume_trend = "Normal"
+    if isinstance(average_volume_raw, (int, float)) and average_volume_raw > 0 and current_volume > 0:
+        volume_vs_avg = round((current_volume / average_volume_raw) * 100, 2)
+        if volume_vs_avg >= 140:
+            volume_trend = "High Volume"
+        elif volume_vs_avg <= 70:
+            volume_trend = "Light Volume"
+
+    risk_level = "Balanced"
+    if isinstance(beta, (int, float)):
+        if beta >= 1.5:
+            risk_level = "Aggressive"
+        elif beta <= 0.85:
+            risk_level = "Defensive"
+
+    setup_score, setup_label, news_sentiment = build_trade_setup({
+        "rsi": latest_rsi,
+        "price": round(current_price, 2),
+        "ma20": latest_ma20,
+        "macd_status": macd_status,
+        "signal": signal
+    }, news)
+    checklist_items, checklist_passed = build_trade_checklist(
+        round(current_price, 2),
+        latest_ema20,
+        latest_ema50,
+        latest_rsi,
+        macd_status,
+        latest_stoch_k,
+        latest_stoch_d,
+        volume_vs_avg if isinstance(volume_vs_avg, (int, float)) else None
+    )
+
     data = {
         "symbol": symbol,
         "name": company_name,
@@ -902,12 +1152,34 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "currency": currency,
         "rsi": latest_rsi,
         "ma20": latest_ma20,
+        "ema20": latest_ema20,
+        "ema50": latest_ema50,
         "macd": latest_macd,
         "signal_line": latest_signal_line,
+        "atr": latest_atr,
+        "stoch_k": latest_stoch_k,
+        "stoch_d": latest_stoch_d,
+        "bb_upper": latest_bb_upper,
+        "bb_middle": latest_bb_middle,
+        "bb_lower": latest_bb_lower,
+        "bb_position": bb_position,
         "macd_status": macd_status,
         "signal": signal,
         "signal_reason": signal_reason,
         "volume": format_volume(current_volume),
+        "avg_volume": format_volume(average_volume_raw) if isinstance(average_volume_raw, (int, float)) else "N/A",
+        "volume_vs_avg": volume_vs_avg,
+        "volume_trend": volume_trend,
+        "beta": beta,
+        "risk_level": risk_level,
+        "week_52_low": week_low,
+        "week_52_high": week_high,
+        "price_position_52w": price_position_52w,
+        "setup_score": setup_score,
+        "setup_label": setup_label,
+        "news_sentiment": news_sentiment,
+        "checklist_items": checklist_items,
+        "checklist_passed": checklist_passed,
         "support_levels": support_levels,
         "resistance_levels": resistance_levels,
         "resolved_from": original_input if original_input else symbol
@@ -927,6 +1199,13 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "volume_colors": volume_colors,
         "macd_values": macd_values,
         "signal_values": signal_values,
+        "stoch_k_values": stoch_k_values,
+        "stoch_d_values": stoch_d_values,
+        "ema20_values": ema20_values,
+        "ema50_values": ema50_values,
+        "bb_upper_values": bb_upper_values,
+        "bb_middle_values": bb_middle_values,
+        "bb_lower_values": bb_lower_values,
         "support_levels": support_levels,
         "resistance_levels": resistance_levels,
         "selected_period": selected_period,
@@ -951,6 +1230,13 @@ def index():
     volume_colors = []
     macd_values = []
     signal_values = []
+    stoch_k_values = []
+    stoch_d_values = []
+    ema20_values = []
+    ema50_values = []
+    bb_upper_values = []
+    bb_middle_values = []
+    bb_lower_values = []
     support_levels = []
     resistance_levels = []
     news = []
@@ -984,6 +1270,13 @@ def index():
                     volume_colors = result["volume_colors"]
                     macd_values = result["macd_values"]
                     signal_values = result["signal_values"]
+                    stoch_k_values = result["stoch_k_values"]
+                    stoch_d_values = result["stoch_d_values"]
+                    ema20_values = result["ema20_values"]
+                    ema50_values = result["ema50_values"]
+                    bb_upper_values = result["bb_upper_values"]
+                    bb_middle_values = result["bb_middle_values"]
+                    bb_lower_values = result["bb_lower_values"]
                     support_levels = result["support_levels"]
                     resistance_levels = result["resistance_levels"]
                     is_intraday = result["is_intraday"]
@@ -1002,6 +1295,13 @@ def index():
         volume_colors=volume_colors,
         macd_values=macd_values,
         signal_values=signal_values,
+        stoch_k_values=stoch_k_values,
+        stoch_d_values=stoch_d_values,
+        ema20_values=ema20_values,
+        ema50_values=ema50_values,
+        bb_upper_values=bb_upper_values,
+        bb_middle_values=bb_middle_values,
+        bb_lower_values=bb_lower_values,
         support_levels=support_levels,
         resistance_levels=resistance_levels,
         selected_period=selected_period,

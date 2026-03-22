@@ -549,6 +549,89 @@
             gap: 10px;
         }
 
+        .tool-row {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .tool-card-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .tool-card-subtitle {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 0 0 18px;
+        }
+
+        .ghost-button {
+            min-height: auto;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .ghost-button:hover {
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .saved-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 42px;
+        }
+
+        .saved-empty {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .saved-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .saved-pill button {
+            min-height: auto;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+            color: #ff9a9a;
+            font-size: 12px;
+        }
+
         .chip {
             padding: 10px 14px;
             border-radius: 999px;
@@ -650,6 +733,265 @@
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.6px;
+        }
+
+        .brief-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brief-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .brief-kicker {
+            color: var(--accent-soft);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .brief-score-row {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brief-score {
+            font-size: 54px;
+            line-height: 0.95;
+            color: white;
+            font-family: "Space Grotesk", Arial, sans-serif;
+        }
+
+        .brief-score span {
+            font-size: 18px;
+            color: var(--muted);
+        }
+
+        .brief-label {
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(38, 198, 160, 0.12);
+            color: #c8fff1;
+            border: 1px solid rgba(38, 198, 160, 0.2);
+        }
+
+        .score-bar {
+            position: relative;
+            height: 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #ff6b6b, #ffb84d 45%, #49e2b4);
+        }
+
+        .brief-points {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .brief-point {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .brief-point-label {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .brief-point-value {
+            color: white;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .range-card {
+            display: grid;
+            gap: 14px;
+        }
+
+        .pro-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .indicator-card,
+        .checklist-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .indicator-card h4,
+        .checklist-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .indicator-main {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .indicator-note {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .checklist-score {
+            color: var(--accent-soft);
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .checklist-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .check-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+            background: var(--danger);
+        }
+
+        .check-item.pass .check-dot {
+            background: var(--success);
+        }
+
+        .chart-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .chart-toggle-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .chart-toggle input {
+            accent-color: var(--primary);
+        }
+
+        .range-track {
+            position: relative;
+            height: 14px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(48, 213, 130, 0.25), rgba(255, 184, 77, 0.25), rgba(255, 107, 107, 0.25));
+            overflow: hidden;
+        }
+
+        .range-marker {
+            position: absolute;
+            top: 50%;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--accent);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 6px rgba(255, 184, 77, 0.16);
+        }
+
+        .range-values,
+        .insight-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .insight-chip {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .insight-chip strong {
+            display: block;
+            color: white;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .insight-chip span {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .stock-card {
@@ -1016,8 +1358,15 @@
             }
 
             .hero-metrics,
-            .market-strip {
+            .market-strip,
+            .brief-grid,
+            .tool-row,
+            .pro-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .indicator-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -1056,7 +1405,11 @@
             }
 
             .stock-details,
-            .news-grid {
+            .news-grid,
+            .brief-points,
+            .range-values,
+            .insight-row,
+            .indicator-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1188,6 +1541,19 @@
         <div class="main-panel" id="analyzer">
             <div class="section-title">Start Analysis</div>
 
+            <div class="tool-row">
+                <div class="tool-card">
+                    <div class="tool-card-title">Recent Searches</div>
+                    <div class="tool-card-subtitle">Jump back into names you checked recently without typing again.</div>
+                    <div class="saved-list" id="recentSearches"></div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-title">Pinned Watchlist</div>
+                    <div class="tool-card-subtitle">Save symbols locally in your browser for quick repeat analysis.</div>
+                    <div class="saved-list" id="favoriteSearches"></div>
+                </div>
+            </div>
+
             <form method="POST" id="stockForm" autocomplete="off">
                 <div class="search-wrapper">
                     <div class="search-row">
@@ -1273,14 +1639,88 @@
                         <div class="last-updated" id="lastUpdated">Last updated: just now</div>
                     </div>
 
-                    <div class="mode-badge" id="modeBadge">
-                        {% if is_intraday %}INTRADAY LIVE MODE{% else %}STANDARD CHART MODE{% endif %}
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <button type="button" id="pinCurrentBtn" style="min-height:auto; padding:12px 16px;">Pin Symbol</button>
+                        <div class="mode-badge" id="modeBadge">
+                            {% if is_intraday %}INTRADAY LIVE MODE{% else %}STANDARD CHART MODE{% endif %}
+                        </div>
                     </div>
                 </div>
 
                 <div class="ai-summary-box" id="aiSummaryBox" {% if not ai_summary %}style="display:none;"{% endif %}>
                     <div class="ai-summary-title">AI SUMMARY</div>
                     <div class="ai-summary-text" id="aiSummary">{{ ai_summary if ai_summary else '' }}</div>
+                </div>
+
+                <div class="action-row">
+                    <button type="button" class="ghost-button" id="copySummaryBtn">Copy Summary</button>
+                    <button type="button" class="ghost-button" id="copySnapshotBtn">Copy Snapshot</button>
+                </div>
+
+                <div class="brief-grid">
+                    <div class="brief-card">
+                        <div class="brief-kicker">Trade Setup Score</div>
+                        <div class="brief-score-row">
+                            <div class="brief-score" id="setupScoreValue">{{ data.setup_score }}<span>/100</span></div>
+                            <div class="brief-label" id="setupLabelValue">{{ data.setup_label }}</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" id="setupScoreFill" style="width: {{ data.setup_score }}%;"></div>
+                        </div>
+                        <div class="brief-points">
+                            <div class="brief-point">
+                                <div class="brief-point-label">Risk Profile</div>
+                                <div class="brief-point-value" id="riskLevelValue">{{ data.risk_level }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">News Sentiment</div>
+                                <div class="brief-point-value" id="newsSentimentValue">{{ data.news_sentiment }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">Average Volume</div>
+                                <div class="brief-point-value" id="avgVolumeValue">{{ data.avg_volume }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">Volume vs Avg</div>
+                                <div class="brief-point-value" id="volumeVsAvgValue">
+                                    {% if data.volume_vs_avg == 'N/A' %}N/A{% else %}{{ data.volume_vs_avg }}%{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="brief-card range-card">
+                        <div class="brief-kicker">Positioning</div>
+                        <div class="range-values">
+                            <div class="brief-point">
+                                <div class="brief-point-label">52W Low</div>
+                                <div class="brief-point-value" id="weekLowValue">{{ data.week_52_low }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">52W High</div>
+                                <div class="brief-point-value" id="weekHighValue">{{ data.week_52_high }}</div>
+                            </div>
+                        </div>
+                        <div class="range-track">
+                            <div class="range-marker" id="rangeMarker" style="left: {{ data.price_position_52w if data.price_position_52w != 'N/A' else 50 }}%;"></div>
+                        </div>
+                        <div class="insight-row">
+                            <div class="insight-chip">
+                                <strong id="volumeTrendValue">{{ data.volume_trend }}</strong>
+                                <span>Current participation versus the stock's typical trading activity.</span>
+                            </div>
+                            <div class="insight-chip">
+                                <strong id="betaValue">{% if data.beta == 'N/A' %}N/A{% else %}Beta {{ data.beta }}{% endif %}</strong>
+                                <span id="pricePositionValue">
+                                    {% if data.price_position_52w == 'N/A' %}
+                                        52-week position is not available.
+                                    {% else %}
+                                        Trading at {{ data.price_position_52w }}% of its recent range.
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="signal-box">
@@ -1297,6 +1737,53 @@
                         {{ data.signal }}
                     </div>
                     <div class="signal-reason" id="signalReason">{{ data.signal_reason }}</div>
+                </div>
+
+                <div class="pro-grid">
+                    <div class="indicator-grid">
+                        <div class="indicator-card">
+                            <h4>EMA Trend</h4>
+                            <div class="indicator-main" id="emaTrendValue">Loading Trend</div>
+                            <div class="indicator-note" id="emaTrendNote">EMA20: {{ data.ema20 }} | EMA50: {{ data.ema50 }}</div>
+                        </div>
+                        <div class="indicator-card">
+                            <h4>Bollinger Bands</h4>
+                            <div class="indicator-main" id="bbPositionValue">{{ data.bb_position }}</div>
+                            <div class="indicator-note" id="bbValuesNote">Upper {{ data.bb_upper }} | Lower {{ data.bb_lower }}</div>
+                        </div>
+                        <div class="indicator-card">
+                            <h4>Volatility</h4>
+                            <div class="indicator-main" id="atrValue">{{ data.atr }}</div>
+                            <div class="indicator-note">ATR (14) highlights daily movement range.</div>
+                        </div>
+                        <div class="indicator-card">
+                            <h4>Stochastic</h4>
+                            <div class="indicator-main" id="stochValue">{{ data.stoch_k }}/{{ data.stoch_d }}</div>
+                            <div class="indicator-note">K/D momentum timing for turns and continuation.</div>
+                        </div>
+                        <div class="indicator-card">
+                            <h4>Participation</h4>
+                            <div class="indicator-main" id="participationValue">{{ data.volume_trend }}</div>
+                            <div class="indicator-note">Current volume is {{ data.volume_vs_avg if data.volume_vs_avg != 'N/A' else 'N/A' }}% of average.</div>
+                        </div>
+                        <div class="indicator-card">
+                            <h4>Market Regime</h4>
+                            <div class="indicator-main" id="regimeValue">{{ data.setup_label }}</div>
+                            <div class="indicator-note">Composite setup score aligned with technical structure.</div>
+                        </div>
+                    </div>
+                    <div class="checklist-card">
+                        <div class="checklist-title">Execution Checklist</div>
+                        <div class="checklist-score" id="checklistScoreValue">{{ data.checklist_passed }}/{{ data.checklist_items|length }} Conditions Passed</div>
+                        <div class="checklist-list" id="checklistContainer">
+                            {% for item in data.checklist_items %}
+                            <div class="check-item {% if item.status %}pass{% endif %}">
+                                <span class="check-dot"></span>
+                                <span>{{ item.label }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="stock-details">
@@ -1442,7 +1929,15 @@
                 </div>
 
                 <div class="chart-box">
-                    <div class="chart-title">Price Chart with Support / Resistance (<span id="periodTitle">{{ selected_period|upper }}</span>)</div>
+                    <div class="chart-toolbar">
+                        <div class="chart-title">Price Chart with Professional Overlays (<span id="periodTitle">{{ selected_period|upper }}</span>)</div>
+                        <div class="chart-toggle-row">
+                            <label class="chart-toggle"><input type="checkbox" id="toggleEma20" checked> EMA20</label>
+                            <label class="chart-toggle"><input type="checkbox" id="toggleEma50" checked> EMA50</label>
+                            <label class="chart-toggle"><input type="checkbox" id="toggleBollinger" checked> Bollinger</label>
+                            <label class="chart-toggle"><input type="checkbox" id="toggleLevels" checked> Levels</label>
+                        </div>
+                    </div>
                     <canvas id="priceChart"></canvas>
                 </div>
 
@@ -1452,6 +1947,11 @@
                     <div class="disclaimer">
                         Intraday mode uses Yahoo Finance interval data. This is for educational use only, not financial advice.
                     </div>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-title">Stochastic Oscillator (<span id="periodTitleStoch">{{ selected_period|upper }}</span>)</div>
+                    <canvas id="stochChart"></canvas>
                 </div>
 
                 <div class="news-wrap">
@@ -1497,10 +1997,99 @@
         const searchBtn = document.getElementById('searchBtn');
         const symbolInput = document.getElementById('symbolInput');
         const suggestionsBox = document.getElementById('suggestionsBox');
+        const recentSearchesEl = document.getElementById('recentSearches');
+        const favoriteSearchesEl = document.getElementById('favoriteSearches');
+        const pinCurrentBtn = document.getElementById('pinCurrentBtn');
+        const copySummaryBtn = document.getElementById('copySummaryBtn');
+        const copySnapshotBtn = document.getElementById('copySnapshotBtn');
+
+        const RECENT_SEARCHES_KEY = 'stock-app-recent-searches';
+        const FAVORITE_SEARCHES_KEY = 'stock-app-favorite-searches';
 
         let currentSuggestions = [];
         let activeSuggestionIndex = -1;
         let suggestionDebounce = null;
+
+        function normalizeSymbol(value) {
+            return String(value || '').trim().toUpperCase();
+        }
+
+        function readStoredList(key) {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeStoredList(key, list) {
+            localStorage.setItem(key, JSON.stringify(list));
+        }
+
+        function renderSavedList(container, list, removable = false) {
+            if (!container) return;
+
+            if (!list.length) {
+                container.innerHTML = '<div class="saved-empty">Nothing saved yet.</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="saved-pill">
+                    <span class="saved-symbol" data-symbol="${item}">${item}</span>
+                    ${removable ? `<button type="button" data-remove-symbol="${item}">Remove</button>` : ''}
+                </div>
+            `).join('');
+
+            container.querySelectorAll('[data-symbol]').forEach(el => {
+                el.addEventListener('click', () => {
+                    symbolInput.value = el.getAttribute('data-symbol');
+                    symbolInput.focus();
+                });
+            });
+
+            if (removable) {
+                container.querySelectorAll('[data-remove-symbol]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        removeFavorite(el.getAttribute('data-remove-symbol'));
+                    });
+                });
+            }
+        }
+
+        function refreshStoredLists() {
+            renderSavedList(recentSearchesEl, readStoredList(RECENT_SEARCHES_KEY));
+            renderSavedList(favoriteSearchesEl, readStoredList(FAVORITE_SEARCHES_KEY), true);
+        }
+
+        function addRecentSearch(symbol) {
+            const normalized = normalizeSymbol(symbol);
+            if (!normalized) return;
+
+            const next = [normalized, ...readStoredList(RECENT_SEARCHES_KEY).filter(item => item !== normalized)].slice(0, 8);
+            writeStoredList(RECENT_SEARCHES_KEY, next);
+            refreshStoredLists();
+        }
+
+        function addFavorite(symbol) {
+            const normalized = normalizeSymbol(symbol);
+            if (!normalized) return;
+
+            const list = readStoredList(FAVORITE_SEARCHES_KEY);
+            if (!list.includes(normalized)) {
+                writeStoredList(FAVORITE_SEARCHES_KEY, [...list, normalized].slice(0, 12));
+                refreshStoredLists();
+            }
+        }
+
+        function removeFavorite(symbol) {
+            const normalized = normalizeSymbol(symbol);
+            writeStoredList(FAVORITE_SEARCHES_KEY, readStoredList(FAVORITE_SEARCHES_KEY).filter(item => item !== normalized));
+            refreshStoredLists();
+        }
+
+        refreshStoredLists();
 
         function hideSuggestions() {
             suggestionsBox.innerHTML = '';
@@ -1627,6 +2216,8 @@
                     return;
                 }
 
+                 addRecentSearch(symbolValue);
+
                 hideSuggestions();
 
                 if (loadingOverlay) {
@@ -1650,11 +2241,47 @@
                 searchBtn.textContent = 'Analyze Now';
             }
         });
+
+        if (pinCurrentBtn) {
+            pinCurrentBtn.addEventListener('click', () => {
+                const targetSymbol = normalizeSymbol((window.currentSymbol || symbolInput.value));
+                if (targetSymbol) {
+                    addFavorite(targetSymbol);
+                }
+            });
+        }
+
+        if (copySummaryBtn) {
+            copySummaryBtn.addEventListener('click', async () => {
+                const summary = document.getElementById('aiSummary')?.textContent?.trim();
+                if (!summary) return;
+                await navigator.clipboard.writeText(summary);
+                copySummaryBtn.textContent = 'Copied';
+                setTimeout(() => { copySummaryBtn.textContent = 'Copy Summary'; }, 1200);
+            });
+        }
+
+        if (copySnapshotBtn) {
+            copySnapshotBtn.addEventListener('click', async () => {
+                const name = document.getElementById('stockName')?.textContent || '';
+                const symbol = document.getElementById('stockSymbol')?.textContent || '';
+                const signal = document.getElementById('signalValue')?.textContent || '';
+                const price = document.getElementById('priceValue')?.textContent || '';
+                const rsi = document.getElementById('rsiValue')?.textContent || '';
+                const macd = document.getElementById('macdValue')?.textContent || '';
+                const score = document.getElementById('setupScoreValue')?.textContent || '';
+                const snapshot = `${name} (${symbol})\nPrice: ${price}\nSignal: ${signal}\nRSI: ${rsi}\nMACD: ${macd}\nSetup Score: ${score}`;
+                await navigator.clipboard.writeText(snapshot);
+                copySnapshotBtn.textContent = 'Copied';
+                setTimeout(() => { copySnapshotBtn.textContent = 'Copy Snapshot'; }, 1200);
+            });
+        }
     </script>
 
     {% if data %}
     <script>
         let currentSymbol = {{ data.symbol | tojson }};
+        window.currentSymbol = currentSymbol;
         let currentPeriod = {{ selected_period | tojson }};
 
         let labels = {{ chart_labels | tojson }};
@@ -1664,12 +2291,21 @@
         let volumeColors = {{ volume_colors | tojson }};
         let macdData = {{ macd_values | tojson }};
         let signalData = {{ signal_values | tojson }};
+        let stochKData = {{ stoch_k_values | tojson }};
+        let stochDData = {{ stoch_d_values | tojson }};
+        let ema20Series = {{ ema20_values | tojson }};
+        let ema50Series = {{ ema50_values | tojson }};
+        let bbUpperSeries = {{ bb_upper_values | tojson }};
+        let bbMiddleSeries = {{ bb_middle_values | tojson }};
+        let bbLowerSeries = {{ bb_lower_values | tojson }};
         let supportLevels = {{ support_levels | tojson }};
         let resistanceLevels = {{ resistance_levels | tojson }};
+        let checklistItems = {{ data.checklist_items | tojson }};
 
         let priceChartInstance = null;
         let volumeChartInstance = null;
         let macdChartInstance = null;
+        let stochChartInstance = null;
         let candlestickChartInstance = null;
 
         function getValueClass(value) {
@@ -1689,6 +2325,90 @@
         function formatCurrency(value, currency) {
             if (value === "N/A" || value === null || value === undefined) return "N/A";
             return currency === "INR" ? `₹${value}` : `$${value}`;
+        }
+
+        function formatCurrency(value, currency) {
+            if (value === "N/A" || value === null || value === undefined) return "N/A";
+            return currency === "INR" ? `Rs ${value}` : `$${value}`;
+        }
+
+        function formatPercentOrNA(value) {
+            return value === "N/A" || value === null || value === undefined ? "N/A" : `${value}%`;
+        }
+
+        function updateBriefInsights(stock) {
+            const scoreFill = document.getElementById('setupScoreFill');
+            const scoreValue = document.getElementById('setupScoreValue');
+            const setupLabelValue = document.getElementById('setupLabelValue');
+            const riskLevelValue = document.getElementById('riskLevelValue');
+            const newsSentimentValue = document.getElementById('newsSentimentValue');
+            const avgVolumeValue = document.getElementById('avgVolumeValue');
+            const volumeVsAvgValue = document.getElementById('volumeVsAvgValue');
+            const weekLowValue = document.getElementById('weekLowValue');
+            const weekHighValue = document.getElementById('weekHighValue');
+            const rangeMarker = document.getElementById('rangeMarker');
+            const volumeTrendValue = document.getElementById('volumeTrendValue');
+            const betaValue = document.getElementById('betaValue');
+            const pricePositionValue = document.getElementById('pricePositionValue');
+
+            if (scoreFill) scoreFill.style.width = `${stock.setup_score || 0}%`;
+            if (scoreValue) scoreValue.innerHTML = `${stock.setup_score || 0}<span>/100</span>`;
+            if (setupLabelValue) setupLabelValue.textContent = stock.setup_label || 'Balanced';
+            if (riskLevelValue) riskLevelValue.textContent = stock.risk_level || 'Balanced';
+            if (newsSentimentValue) newsSentimentValue.textContent = stock.news_sentiment || 'Mixed';
+            if (avgVolumeValue) avgVolumeValue.textContent = stock.avg_volume || 'N/A';
+            if (volumeVsAvgValue) volumeVsAvgValue.textContent = formatPercentOrNA(stock.volume_vs_avg);
+            if (weekLowValue) weekLowValue.textContent = stock.week_52_low ?? 'N/A';
+            if (weekHighValue) weekHighValue.textContent = stock.week_52_high ?? 'N/A';
+            if (rangeMarker) rangeMarker.style.left = `${stock.price_position_52w === 'N/A' ? 50 : stock.price_position_52w}%`;
+            if (volumeTrendValue) volumeTrendValue.textContent = stock.volume_trend || 'Normal';
+            if (betaValue) betaValue.textContent = stock.beta === 'N/A' ? 'N/A' : `Beta ${stock.beta}`;
+            if (pricePositionValue) {
+                pricePositionValue.textContent = stock.price_position_52w === 'N/A'
+                    ? '52-week position is not available.'
+                    : `Trading at ${stock.price_position_52w}% of its recent range.`;
+            }
+
+            const emaTrendValue = document.getElementById('emaTrendValue');
+            const emaTrendNote = document.getElementById('emaTrendNote');
+            const bbPositionValue = document.getElementById('bbPositionValue');
+            const bbValuesNote = document.getElementById('bbValuesNote');
+            const atrValue = document.getElementById('atrValue');
+            const stochValue = document.getElementById('stochValue');
+            const participationValue = document.getElementById('participationValue');
+            const regimeValue = document.getElementById('regimeValue');
+
+            if (emaTrendValue) {
+                emaTrendValue.textContent =
+                    stock.ema20 !== 'N/A' && stock.ema50 !== 'N/A'
+                        ? (stock.ema20 > stock.ema50 ? 'Bullish Stack' : 'Bearish Stack')
+                        : 'N/A';
+            }
+            if (emaTrendNote) emaTrendNote.textContent = `EMA20: ${stock.ema20} | EMA50: ${stock.ema50}`;
+            if (bbPositionValue) bbPositionValue.textContent = stock.bb_position || 'N/A';
+            if (bbValuesNote) bbValuesNote.textContent = `Upper ${stock.bb_upper} | Lower ${stock.bb_lower}`;
+            if (atrValue) atrValue.textContent = stock.atr || 'N/A';
+            if (stochValue) stochValue.textContent = `${stock.stoch_k || 'N/A'}/${stock.stoch_d || 'N/A'}`;
+            if (participationValue) participationValue.textContent = stock.volume_trend || 'Normal';
+            if (regimeValue) regimeValue.textContent = stock.setup_label || 'Balanced';
+        }
+
+        function renderChecklist(items) {
+            const checklistContainer = document.getElementById('checklistContainer');
+            const checklistScoreValue = document.getElementById('checklistScoreValue');
+            if (!checklistContainer || !Array.isArray(items)) return;
+
+            const passed = items.filter(item => item.status).length;
+            if (checklistScoreValue) {
+                checklistScoreValue.textContent = `${passed}/${items.length} Conditions Passed`;
+            }
+
+            checklistContainer.innerHTML = items.map(item => `
+                <div class="check-item ${item.status ? 'pass' : ''}">
+                    <span class="check-dot"></span>
+                    <span>${item.label}</span>
+                </div>
+            `).join('');
         }
 
         function renderNews(news) {
@@ -1731,6 +2451,11 @@
         }
 
         function buildPriceDatasets(prices, supports, resistances) {
+            const showEma20 = document.getElementById('toggleEma20')?.checked ?? true;
+            const showEma50 = document.getElementById('toggleEma50')?.checked ?? true;
+            const showBollinger = document.getElementById('toggleBollinger')?.checked ?? true;
+            const showLevels = document.getElementById('toggleLevels')?.checked ?? true;
+
             const datasets = [
                 {
                     label: 'Closing Price',
@@ -1743,29 +2468,82 @@
                 }
             ];
 
-            supports.forEach((level, index) => {
+            if (showEma20) {
                 datasets.push({
-                    label: `Support ${index + 1}`,
-                    data: Array(prices.length).fill(level),
-                    borderColor: '#22c55e',
-                    borderDash: [6, 6],
+                    label: 'EMA20',
+                    data: ema20Series,
+                    borderColor: '#49e2b4',
                     fill: false,
                     pointRadius: 0,
-                    tension: 0
+                    tension: 0.18
                 });
-            });
+            }
 
-            resistances.forEach((level, index) => {
+            if (showEma50) {
                 datasets.push({
-                    label: `Resistance ${index + 1}`,
-                    data: Array(prices.length).fill(level),
-                    borderColor: '#ef4444',
-                    borderDash: [6, 6],
+                    label: 'EMA50',
+                    data: ema50Series,
+                    borderColor: '#ffb84d',
                     fill: false,
                     pointRadius: 0,
-                    tension: 0
+                    tension: 0.18
                 });
-            });
+            }
+
+            if (showBollinger) {
+                datasets.push({
+                    label: 'BB Upper',
+                    data: bbUpperSeries,
+                    borderColor: 'rgba(255,255,255,0.45)',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.15
+                });
+                datasets.push({
+                    label: 'BB Mid',
+                    data: bbMiddleSeries,
+                    borderColor: 'rgba(255,255,255,0.28)',
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.15
+                });
+                datasets.push({
+                    label: 'BB Lower',
+                    data: bbLowerSeries,
+                    borderColor: 'rgba(255,255,255,0.45)',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.15
+                });
+            }
+
+            if (showLevels) {
+                supports.forEach((level, index) => {
+                    datasets.push({
+                        label: `Support ${index + 1}`,
+                        data: Array(prices.length).fill(level),
+                        borderColor: '#22c55e',
+                        borderDash: [6, 6],
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0
+                    });
+                });
+
+                resistances.forEach((level, index) => {
+                    datasets.push({
+                        label: `Resistance ${index + 1}`,
+                        data: Array(prices.length).fill(level),
+                        borderColor: '#ef4444',
+                        borderDash: [6, 6],
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0
+                    });
+                });
+            }
 
             return datasets;
         }
@@ -1880,12 +2658,14 @@
             const priceCanvas = document.getElementById('priceChart');
             const volumeCanvas = document.getElementById('volumeChart');
             const macdCanvas = document.getElementById('macdChart');
+            const stochCanvas = document.getElementById('stochChart');
 
-            if (!priceCanvas || !volumeCanvas || !macdCanvas) return;
+            if (!priceCanvas || !volumeCanvas || !macdCanvas || !stochCanvas) return;
 
             const priceCtx = priceCanvas.getContext('2d');
             const volumeCtx = volumeCanvas.getContext('2d');
             const macdCtx = macdCanvas.getContext('2d');
+            const stochCtx = stochCanvas.getContext('2d');
 
             priceChartInstance = new Chart(priceCtx, {
                 type: 'line',
@@ -1984,10 +2764,70 @@
                 }
             });
 
+            stochChartInstance = new Chart(stochCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Stoch %K',
+                            data: stochKData,
+                            borderColor: '#ffb84d',
+                            tension: 0.2,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Stoch %D',
+                            data: stochDData,
+                            borderColor: '#49e2b4',
+                            tension: 0.2,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Overbought',
+                            data: Array(labels.length).fill(80),
+                            borderColor: 'rgba(255,255,255,0.25)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Oversold',
+                            data: Array(labels.length).fill(20),
+                            borderColor: 'rgba(255,255,255,0.25)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    animation: false,
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { maxTicksLimit: 12, color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        }
+                    }
+                }
+            });
+
             initCandlestickChart(candleData);
         }
 
-        function updateCharts(newLabels, newPrices, newVolumes, newVolumeColors, newMacd, newSignal, newSupports, newResistances) {
+        function updateCharts(newLabels, newPrices, newVolumes, newVolumeColors, newMacd, newSignal, newSupports, newResistances, newStochK, newStochD) {
             if (priceChartInstance) {
                 priceChartInstance.data.labels = newLabels || [];
                 priceChartInstance.data.datasets = buildPriceDatasets(newPrices || [], newSupports || [], newResistances || []);
@@ -2007,6 +2847,15 @@
                 macdChartInstance.data.datasets[1].data = newSignal || [];
                 macdChartInstance.update();
             }
+
+            if (stochChartInstance) {
+                stochChartInstance.data.labels = newLabels || [];
+                stochChartInstance.data.datasets[0].data = newStochK || [];
+                stochChartInstance.data.datasets[1].data = newStochD || [];
+                stochChartInstance.data.datasets[2].data = Array((newLabels || []).length).fill(80);
+                stochChartInstance.data.datasets[3].data = Array((newLabels || []).length).fill(20);
+                stochChartInstance.update();
+            }
         }
 
         async function refreshLiveData() {
@@ -2019,6 +2868,8 @@
                 if (!result.success) return;
 
                 const stock = result.data;
+                currentSymbol = stock.symbol || currentSymbol;
+                window.currentSymbol = currentSymbol;
 
                 labels = result.chart_labels || [];
                 priceData = result.chart_prices || [];
@@ -2027,8 +2878,16 @@
                 volumeColors = result.volume_colors || [];
                 macdData = result.macd_values || [];
                 signalData = result.signal_values || [];
+                stochKData = result.stoch_k_values || [];
+                stochDData = result.stoch_d_values || [];
+                ema20Series = result.ema20_values || [];
+                ema50Series = result.ema50_values || [];
+                bbUpperSeries = result.bb_upper_values || [];
+                bbMiddleSeries = result.bb_middle_values || [];
+                bbLowerSeries = result.bb_lower_values || [];
                 supportLevels = result.support_levels || [];
                 resistanceLevels = result.resistance_levels || [];
+                checklistItems = stock.checklist_items || [];
 
                 document.getElementById('stockName').textContent = stock.name || 'N/A';
                 document.getElementById('stockSymbol').textContent = stock.symbol || 'N/A';
@@ -2042,6 +2901,8 @@
                 document.getElementById('macdValue').textContent = stock.macd || 'N/A';
                 document.getElementById('signalLineValue').textContent = stock.signal_line || 'N/A';
                 document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                updateBriefInsights(stock);
+                renderChecklist(checklistItems);
 
                 renderLevelBadges('supportLevelsBox', supportLevels, 'support');
                 renderLevelBadges('resistanceLevelsBox', resistanceLevels, 'resistance');
@@ -2083,6 +2944,7 @@
                 document.getElementById('periodTitleMacd').textContent = (result.selected_period || currentPeriod).toUpperCase();
                 document.getElementById('periodTitleCandle').textContent = (result.selected_period || currentPeriod).toUpperCase();
                 document.getElementById('periodTitleVolume').textContent = (result.selected_period || currentPeriod).toUpperCase();
+                document.getElementById('periodTitleStoch').textContent = (result.selected_period || currentPeriod).toUpperCase();
                 document.getElementById('modeBadge').textContent = result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE';
 
                 const resolvedTextEl = document.getElementById('resolvedText');
@@ -2102,7 +2964,9 @@
                     macdData,
                     signalData,
                     supportLevels,
-                    resistanceLevels
+                    resistanceLevels,
+                    stochKData,
+                    stochDData
                 );
                 await updateCandlestickChart(candleData, supportLevels, resistanceLevels);
             } catch (error) {
@@ -2110,6 +2974,29 @@
             }
         }
 
+        addRecentSearch(currentSymbol);
+        updateBriefInsights({
+            setup_score: {{ data.setup_score | tojson }},
+            setup_label: {{ data.setup_label | tojson }},
+            risk_level: {{ data.risk_level | tojson }},
+            news_sentiment: {{ data.news_sentiment | tojson }},
+            avg_volume: {{ data.avg_volume | tojson }},
+            volume_vs_avg: {{ data.volume_vs_avg | tojson }},
+            week_52_low: {{ data.week_52_low | tojson }},
+            week_52_high: {{ data.week_52_high | tojson }},
+            price_position_52w: {{ data.price_position_52w | tojson }},
+            volume_trend: {{ data.volume_trend | tojson }},
+            beta: {{ data.beta | tojson }},
+            ema20: {{ data.ema20 | tojson }},
+            ema50: {{ data.ema50 | tojson }},
+            bb_position: {{ data.bb_position | tojson }},
+            bb_upper: {{ data.bb_upper | tojson }},
+            bb_lower: {{ data.bb_lower | tojson }},
+            atr: {{ data.atr | tojson }},
+            stoch_k: {{ data.stoch_k | tojson }},
+            stoch_d: {{ data.stoch_d | tojson }}
+        });
+        renderChecklist(checklistItems);
         initCharts();
         setInterval(refreshLiveData, 15000);
 
@@ -2117,6 +3004,23 @@
             radio.addEventListener('change', () => {
                 currentPeriod = document.querySelector('input[name="period"]:checked').value;
                 refreshLiveData();
+            });
+        });
+
+        ['toggleEma20', 'toggleEma50', 'toggleBollinger', 'toggleLevels'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', () => {
+                updateCharts(
+                    labels,
+                    priceData,
+                    volumeData,
+                    volumeColors,
+                    macdData,
+                    signalData,
+                    supportLevels,
+                    resistanceLevels,
+                    stochKData,
+                    stochDData
+                );
             });
         });
     </script>
