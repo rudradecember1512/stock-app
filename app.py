@@ -401,6 +401,72 @@ def calculate_support_resistance(hist):
     return support_levels, resistance_levels
 
 
+def get_safe_info(stock):
+    try:
+        info = stock.info
+        return info if isinstance(info, dict) else {}
+    except Exception:
+        return {}
+
+
+def get_safe_fast_info(stock):
+    try:
+        fast_info = stock.fast_info
+        return dict(fast_info) if fast_info else {}
+    except Exception:
+        return {}
+
+
+def safe_get_market_cap(info, fast_info):
+    market_cap = info.get("marketCap")
+
+    if not isinstance(market_cap, (int, float)):
+        market_cap = fast_info.get("market_cap")
+
+    return format_market_cap(market_cap) if isinstance(market_cap, (int, float)) else "N/A"
+
+
+def safe_get_pe_ratio(info):
+    pe_ratio = info.get("trailingPE")
+
+    if isinstance(pe_ratio, (int, float)):
+        return round(pe_ratio, 2)
+
+    forward_pe = info.get("forwardPE")
+    if isinstance(forward_pe, (int, float)):
+        return round(forward_pe, 2)
+
+    return "N/A"
+
+
+def safe_get_sector(info):
+    sector = info.get("sector")
+    if sector and str(sector).strip():
+        return sector
+
+    industry = info.get("industry")
+    if industry and str(industry).strip():
+        return industry
+
+    quote_type = info.get("quoteType")
+    if quote_type and str(quote_type).strip():
+        return quote_type
+
+    return "N/A"
+
+
+def detect_currency(symbol, info, fast_info):
+    currency = info.get("currency") or fast_info.get("currency")
+
+    if currency and str(currency).strip():
+        return str(currency).upper()
+
+    if str(symbol).upper().endswith(".NS") or str(symbol).upper().endswith(".BO"):
+        return "INR"
+
+    return "USD"
+
+
 def get_stock_news(company_name, symbol):
     news_list = []
 
@@ -571,14 +637,6 @@ def generate_ai_summary(data, news, selected_period):
     return " ".join(summary_parts)
 
 
-def get_safe_info(stock):
-    try:
-        info = stock.info
-        return info if isinstance(info, dict) else {}
-    except Exception:
-        return {}
-
-
 def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     stock = yf.Ticker(symbol)
     config = get_history_config(selected_period)
@@ -588,6 +646,7 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     hist_2d = stock.history(period="2d", interval="1d")
 
     info = get_safe_info(stock)
+    fast_info = get_safe_fast_info(stock)
 
     if hist_main.empty and hist_6mo.empty and hist_2d.empty:
         return {
@@ -699,10 +758,9 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         recent_hist = hist_6mo.tail(90)
         support_levels, resistance_levels = calculate_support_resistance(recent_hist)
 
-    market_cap = format_market_cap(info.get("marketCap"))
-    pe_ratio = info.get("trailingPE", "N/A")
-    if isinstance(pe_ratio, (int, float)):
-        pe_ratio = round(pe_ratio, 2)
+    market_cap = safe_get_market_cap(info, fast_info)
+    pe_ratio = safe_get_pe_ratio(info)
+    currency = detect_currency(symbol, info, fast_info)
 
     signal = "Neutral"
     signal_reason = "Indicators are mixed"
@@ -732,7 +790,7 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
             signal = "Bearish Momentum"
             signal_reason = "MACD is below signal line, indicating negative momentum"
 
-    company_name = info.get("longName") or symbol
+    company_name = info.get("longName") or fast_info.get("shortName") or symbol
     clean_name = clean_company_name(company_name)
     news = get_stock_news(clean_name, symbol)
 
@@ -742,10 +800,10 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "price": round(current_price, 2),
         "change": round(change, 2),
         "percent": round(percent_change, 2),
-        "sector": info.get("sector", "N/A"),
+        "sector": safe_get_sector(info),
         "market_cap": market_cap,
         "pe_ratio": pe_ratio,
-        "currency": info.get("currency", "USD"),
+        "currency": currency,
         "rsi": latest_rsi,
         "ma20": latest_ma20,
         "macd": latest_macd,
