@@ -467,69 +467,165 @@ def detect_currency(symbol, info, fast_info):
     return "USD"
 
 
-def get_stock_news(company_name, symbol):
-    news_list = []
+def is_relevant_article(text, company_name, clean_symbol):
+    combined_text = str(text or "").lower()
+    company_check = str(company_name or "").strip().lower()
+    symbol_check = str(clean_symbol or "").strip().lower()
 
+    if not combined_text:
+        return False
+
+    company_tokens = [token for token in company_check.replace("&", " ").split() if len(token) > 2]
+
+    if company_check and company_check in combined_text:
+        return True
+
+    if symbol_check and symbol_check in combined_text:
+        return True
+
+    if company_tokens and sum(token in combined_text for token in company_tokens) >= min(2, len(company_tokens)):
+        return True
+
+    return False
+
+
+def append_news_item(news_list, article):
+    url_link = article.get("url") or "#"
+
+    if any(item["url"] == url_link for item in news_list):
+        return
+
+    news_list.append({
+        "title": article.get("title") or "No title",
+        "source": article.get("source") or "Unknown Source",
+        "url": url_link,
+        "published_at": article.get("published_at") or "",
+        "description": article.get("description") or "No description available."
+    })
+
+
+def fetch_newsapi_articles(company_name, clean_symbol, news_list):
     if not NEWS_API_KEY:
-        return news_list
+        return
+
+    search_queries = []
+
+    if company_name and company_name.upper() != clean_symbol.upper():
+        search_queries.extend([
+            f'"{company_name}"',
+            f'"{company_name}" AND stock',
+            f'"{company_name}" AND earnings'
+        ])
+
+    if clean_symbol:
+        search_queries.extend([
+            f'"{clean_symbol}" AND stock',
+            f'"{clean_symbol}" AND shares'
+        ])
+
+    for query in search_queries:
+        url = "https://newsapi.org/v2/everything"
+        params = {
+            "q": query,
+            "language": "en",
+            "sortBy": "publishedAt",
+            "pageSize": 10,
+            "searchIn": "title,description",
+            "apiKey": NEWS_API_KEY
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        data = response.json()
+
+        if data.get("status") != "ok":
+            continue
+
+        for article in data.get("articles", []):
+            title = article.get("title") or "No title"
+            description = article.get("description") or "No description available."
+            combined_text = f"{title} {description}"
+
+            if not is_relevant_article(combined_text, company_name, clean_symbol):
+                continue
+
+            append_news_item(news_list, {
+                "title": title,
+                "source": article.get("source", {}).get("name", "Unknown Source"),
+                "url": article.get("url") or "#",
+                "published_at": (article.get("publishedAt") or "")[:10],
+                "description": description
+            })
+
+            if len(news_list) >= 6:
+                return
+
+
+def fetch_yfinance_articles(stock, company_name, clean_symbol, news_list):
+    if stock is None:
+        return
+
+    try:
+        yahoo_news = stock.news or []
+    except Exception:
+        yahoo_news = []
+
+    for article in yahoo_news:
+        content = article.get("content") if isinstance(article, dict) else {}
+        title = (
+            article.get("title")
+            or content.get("title")
+            or "No title"
+        )
+        summary = (
+            article.get("summary")
+            or content.get("summary")
+            or content.get("description")
+            or "No description available."
+        )
+        url_link = (
+            article.get("link")
+            or content.get("canonicalUrl", {}).get("url")
+            or article.get("url")
+            or "#"
+        )
+        source = (
+            article.get("publisher")
+            or content.get("provider", {}).get("displayName")
+            or "Yahoo Finance"
+        )
+        published_at = ""
+        pub_time = article.get("providerPublishTime") or content.get("pubDate")
+        if isinstance(pub_time, (int, float)):
+            published_at = pd.to_datetime(pub_time, unit="s", errors="coerce").strftime("%Y-%m-%d")
+        elif isinstance(pub_time, str):
+            published_at = pub_time[:10]
+
+        combined_text = f"{title} {summary}"
+        if not is_relevant_article(combined_text, company_name, clean_symbol):
+            continue
+
+        append_news_item(news_list, {
+            "title": title,
+            "source": source,
+            "url": url_link,
+            "published_at": published_at,
+            "description": summary
+        })
+
+        if len(news_list) >= 6:
+            return
+
+
+def get_stock_news(company_name, symbol, stock=None):
+    news_list = []
 
     try:
         clean_symbol = str(symbol).replace(".NS", "").replace(".BO", "").strip()
         company_name = str(company_name or "").strip()
+        fetch_newsapi_articles(company_name, clean_symbol, news_list)
 
-        search_queries = []
-
-        if company_name and company_name.upper() != str(symbol).upper():
-            search_queries.extend([
-                f'"{company_name}"',
-                f'"{company_name}" AND stock',
-                f'"{company_name}" AND earnings'
-            ])
-
-        if clean_symbol:
-            search_queries.append(f'"{clean_symbol}" AND stock')
-
-        for query in search_queries:
-            url = "https://newsapi.org/v2/everything"
-            params = {
-                "q": query,
-                "language": "en",
-                "sortBy": "publishedAt",
-                "pageSize": 10,
-                "searchIn": "title,description",
-                "apiKey": NEWS_API_KEY
-            }
-
-            response = requests.get(url, params=params, timeout=10)
-            data = response.json()
-
-            if data.get("status") != "ok":
-                continue
-
-            for article in data.get("articles", []):
-                title = article.get("title") or "No title"
-                description = article.get("description") or "No description available."
-                source = article.get("source", {}).get("name", "Unknown Source")
-                url_link = article.get("url") or "#"
-                published_at = (article.get("publishedAt") or "")[:10]
-
-                combined_text = f"{title} {description}".lower()
-                company_check = company_name.lower()
-                symbol_check = clean_symbol.lower()
-
-                if company_check in combined_text or symbol_check in combined_text:
-                    already_exists = any(item["url"] == url_link for item in news_list)
-                    if not already_exists:
-                        news_list.append({
-                            "title": title,
-                            "source": source,
-                            "url": url_link,
-                            "published_at": published_at,
-                            "description": description
-                        })
-
-                if len(news_list) >= 6:
-                    return news_list
+        if len(news_list) < 6:
+            fetch_yfinance_articles(stock, company_name, clean_symbol, news_list)
 
     except Exception as e:
         print("News fetch error:", e)
@@ -792,7 +888,7 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
 
     company_name = info.get("longName") or fast_info.get("shortName") or symbol
     clean_name = clean_company_name(company_name)
-    news = get_stock_news(clean_name, symbol)
+    news = get_stock_news(clean_name, symbol, stock=stock)
 
     data = {
         "symbol": symbol,
