@@ -914,7 +914,17 @@ def index():
         error_message=error_message,
         is_intraday=is_intraday
     )
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
 
 @app.route("/live-data/<symbol>")
 def live_data(symbol):
