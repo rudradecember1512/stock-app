@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analyzer Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root {
+            --bg-1: #0b1020;
+            --bg-2: #111827;
+            --panel: rgba(17, 24, 39, 0.78);
+            --panel-2: rgba(15, 23, 42, 0.88);
+            --card: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-2: #60a5fa;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
+                radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 24%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            padding: 28px 16px 40px;
+        }
+
+        .page-shell {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: var(--shadow);
+        }
+
+        .brand-text h1 {
+            font-size: 28px;
+            line-height: 1.1;
+            color: white;
+        }
+
+        .brand-text p {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .topbar-badge {
+            background: rgba(59, 130, 246, 0.12);
+            color: #bfdbfe;
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(17, 24, 39, 0.92));
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 26px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -40px;
+            top: -40px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.18), transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 0.9fr;
+            gap: 22px;
+            align-items: center;
+        }
+
+        .hero h2 {
+            font-size: 34px;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 15px;
+            max-width: 700px;
+        }
+
+        .hero-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .hero-point {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero-side {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .hero-side-title {
+            color: #bfdbfe;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            margin-bottom: 14px;
+        }
+
+        .hero-side-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .hero-side-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .hero-side-item strong {
+            display: block;
+            color: white;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .hero-side-item span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .main-panel {
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: white;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.78);
+            color: white;
+            border-radius: 16px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        input[type="text"]::placeholder {
+            color: #94a3b8;
+        }
+
+        input[type="text"]:focus {
+            border-color: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        button {
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 16px;
+            padding: 0 24px;
+            cursor: pointer;
+            transition: 0.25s;
+            min-height: 54px;
+            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.28);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(59, 130, 246, 0.32);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 120px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .suggestion-item {
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item.active {
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        .suggestion-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .suggestion-symbol {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: #dbeafe;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chip:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .period-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .period-buttons label {
+            cursor: pointer;
+        }
+
+        .period-buttons input[type="radio"] {
+            display: none;
+        }
+
+        .period-tag {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border: 1px solid var(--card-border);
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.25s;
+        }
+
+        .period-buttons input[type="radio"]:checked + .period-tag {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: white;
+            border-color: transparent;
+        }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fecaca;
+            padding: 16px 18px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 44px 20px 20px;
+        }
+
+        .empty-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(34, 197, 94, 0.12));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .empty-state h2 {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .live-badge {
+            margin: 0 auto 16px;
+            width: fit-content;
+            background: rgba(34, 197, 94, 0.12);
+            color: #bbf7d0;
+            border: 1px solid rgba(34, 197, 94, 0.24);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+        }
+
+        .stock-card {
+            margin-top: 10px;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+            padding: 22px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+            border: 1px solid var(--card-border);
+        }
+
+        .stock-name {
+            font-size: 34px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .stock-symbol {
+            font-size: 16px;
+            color: #93c5fd;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .resolved-text,
+        .last-updated {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .mode-badge {
+            width: fit-content;
+            background: rgba(59, 130, 246, 0.12);
+            color: #bfdbfe;
+            border: 1px solid rgba(59, 130, 246, 0.24);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .ai-summary-box,
+        .signal-box,
+        .chart-box,
+        .volume-chart-box,
+        .news-wrap,
+        .level-box,
+        .detail-box {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+        }
+
+        .ai-summary-box {
+            padding: 22px;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(30, 41, 59, 0.5));
+        }
+
+        .ai-summary-title {
+            font-size: 13px;
+            color: #bfdbfe;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+
+        .ai-summary-text {
+            font-size: 15px;
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+
+        .signal-box {
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+
+        .signal-title {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .signal-value {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .signal-reason {
+            font-size: 15px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .stock-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .detail-box,
+        .level-box {
+            padding: 18px;
+        }
+
+        .label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .value {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            word-break: break-word;
+        }
+
+        .positive {
+            color: var(--success) !important;
+        }
+
+        .negative {
+            color: var(--danger) !important;
+        }
+
+        .neutral {
+            color: var(--warning) !important;
+        }
+
+        .level-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-pill {
+            padding: 9px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .support-pill {
+            background: rgba(34, 197, 94, 0.12);
+            color: #bbf7d0;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .resistance-pill {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .chart-box,
+        .volume-chart-box,
+        .news-wrap {
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+
+        .chart-title,
+        .news-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .candle-chart {
+            width: 100%;
+            min-height: 380px;
+        }
+
+        canvas {
+            width: 100% !important;
+            max-height: 380px;
+        }
+
+        .disclaimer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid var(--card-border);
+        }
+
+        .news-card h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+            color: white;
+            line-height: 1.45;
+        }
+
+        .news-card p {
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .news-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .news-link {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .no-news {
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 18px;
+            line-height: 1.6;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.72);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(6px);
+        }
+
+        .loading-box {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--card-border);
+            padding: 24px 28px;
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 280px;
+        }
+
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border: 5px solid rgba(255, 255, 255, 0.15);
+            border-top: 5px solid var(--primary-2);
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            animation: spin 0.9s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: white;
+            font-weight: 800;
+        }
+
+        .sub-loading-text {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1100px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stock-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 18px 10px 28px;
+            }
+
+            .main-panel,
+            .hero {
+                padding: 18px;
+            }
+
+            .brand-text h1 {
+                font-size: 24px;
+            }
+
+            .hero h2 {
+                font-size: 28px;
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+            .suggestions-box {
+                right: 0;
+            }
+
+            .stock-header {
+                padding: 18px;
+            }
+
+            .stock-name {
+                font-size: 28px;
+            }
+
+            .stock-details,
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .value {
+                font-size: 21px;
+            }
+
+            .signal-value {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching stock data...</div>
+            <div class="sub-loading-text">Please wait while we analyze the stock</div>
+        </div>
+    </div>
+
+    <div class="page-shell">
+        <div class="topbar">
+            <div class="brand">
+                <div class="brand-logo">↗</div>
+                <div class="brand-text">
+                    <h1>Stock Analyzer Pro</h1>
+                    <p>Live charts, technical indicators, news, and AI-based stock summary</p>
+                </div>
+            </div>
+            <div class="topbar-badge">LIVE ON RENDER</div>
+        </div>
+
+        <div class="hero">
+            <div class="hero-grid">
+                <div>
+                    <h2>Analyze stocks with charts, indicators, volume and key levels</h2>
+                    <p>
+                        Search Indian and US stocks by name or symbol, view candlestick charts,
+                        support/resistance levels, MACD, RSI, recent news, and a quick AI summary
+                        in one clean dashboard.
+                    </p>
+
+                    <div class="hero-points">
+                        <div class="hero-point">Candlestick + Volume</div>
+                        <div class="hero-point">MACD + RSI</div>
+                        <div class="hero-point">Support / Resistance</div>
+                        <div class="hero-point">Autocomplete Search</div>
+                        <div class="hero-point">Live Refresh</div>
+                    </div>
+                </div>
+
+                <div class="hero-side">
+                    <div class="hero-side-title">QUICK START</div>
+                    <div class="hero-side-list">
+                        <div class="hero-side-item">
+                            <strong>Search by name</strong>
+                            <span>Try Apple, Reliance, TCS, Infosys, Tesla</span>
+                        </div>
+                        <div class="hero-side-item">
+                            <strong>Search by symbol</strong>
+                            <span>Try AAPL, RELIANCE.NS, TCS.NS, TSLA</span>
+                        </div>
+                        <div class="hero-side-item">
+                            <strong>Use timeframes</strong>
+                            <span>Switch between 1D, 5D, 1M, 3M, 6M and 1Y</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="section-title">Search Stock</div>
+
+            <form method="POST" id="stockForm" autocomplete="off">
+                <div class="search-wrapper">
+                    <div class="search-row">
+                        <input type="text" id="symbolInput" name="symbol" placeholder="Enter stock name or symbol (e.g. Apple, AAPL, Reliance, RELIANCE.NS)" required>
+                        <button type="submit" id="searchBtn">Analyze Now</button>
+                    </div>
+                    <div class="suggestions-box" id="suggestionsBox"></div>
+                </div>
+
+                <div class="quick-chips">
+                    <div class="chip" data-symbol="AAPL">AAPL</div>
+                    <div class="chip" data-symbol="TSLA">TSLA</div>
+                    <div class="chip" data-symbol="NVDA">NVDA</div>
+                    <div class="chip" data-symbol="RELIANCE.NS">RELIANCE.NS</div>
+                    <div class="chip" data-symbol="TCS.NS">TCS.NS</div>
+                    <div class="chip" data-symbol="INFY.NS">INFY.NS</div>
+                    <div class="chip" data-symbol="SBIN.NS">SBIN.NS</div>
+                    <div class="chip" data-symbol="M&M.NS">M&M.NS</div>
+                </div>
+
+                <div class="period-buttons">
+                    <label>
+                        <input type="radio" name="period" value="1d" {% if selected_period == '1d' %}checked{% endif %}>
+                        <span class="period-tag">1D Live</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="5d" {% if selected_period == '5d' %}checked{% endif %}>
+                        <span class="period-tag">5D Live</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="1mo" {% if selected_period == '1mo' %}checked{% endif %}>
+                        <span class="period-tag">1M</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="3mo" {% if selected_period == '3mo' %}checked{% endif %}>
+                        <span class="period-tag">3M</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="6mo" {% if selected_period == '6mo' %}checked{% endif %}>
+                        <span class="period-tag">6M</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="1y" {% if selected_period == '1y' %}checked{% endif %}>
+                        <span class="period-tag">1Y</span>
+                    </label>
+                </div>
+            </form>
+
+            {% if error_message %}
+            <div class="error-box" id="errorBox">{{ error_message }}</div>
+            {% else %}
+            <div class="error-box" id="errorBox" style="display:none;"></div>
+            {% endif %}
+
+            {% if not data and not error_message %}
+            <div class="empty-state">
+                <div class="empty-icon">📈</div>
+                <h2>Search any stock</h2>
+                <p>
+                    Enter a stock name or symbol to view candlestick chart, support/resistance,
+                    volume, RSI, MACD, AI summary, and latest news — all in one modern dashboard.
+                </p>
+            </div>
+            {% endif %}
+
+            {% if data %}
+            <div class="live-badge">LIVE AUTO REFRESH EVERY 15 SECONDS</div>
+
+            <div class="stock-card" id="stockCard">
+                <div class="stock-header">
+                    <div>
+                        <div class="stock-name" id="stockName">{{ data.name }}</div>
+                        <div class="stock-symbol" id="stockSymbol">{{ data.symbol }}</div>
+
+                        {% if data.resolved_from and data.resolved_from|upper != data.symbol %}
+                        <div class="resolved-text" id="resolvedText">
+                            Showing result for "<b>{{ data.resolved_from }}</b>" → {{ data.symbol }}
+                        </div>
+                        {% else %}
+                        <div class="resolved-text" id="resolvedText" style="display:none;"></div>
+                        {% endif %}
+
+                        <div class="last-updated" id="lastUpdated">Last updated: just now</div>
+                    </div>
+
+                    <div class="mode-badge" id="modeBadge">
+                        {% if is_intraday %}INTRADAY LIVE MODE{% else %}STANDARD CHART MODE{% endif %}
+                    </div>
+                </div>
+
+                <div class="ai-summary-box" id="aiSummaryBox" {% if not ai_summary %}style="display:none;"{% endif %}>
+                    <div class="ai-summary-title">AI SUMMARY</div>
+                    <div class="ai-summary-text" id="aiSummary">{{ ai_summary if ai_summary else '' }}</div>
+                </div>
+
+                <div class="signal-box">
+                    <div class="signal-title">Indicator Signal</div>
+                    <div class="signal-value
+                        {% if 'Buy' in data.signal or 'Bullish' in data.signal or 'Reversal' in data.signal %}
+                            positive
+                        {% elif 'Sell' in data.signal or 'Bearish' in data.signal or 'Caution' in data.signal %}
+                            negative
+                        {% else %}
+                            neutral
+                        {% endif %}
+                    " id="signalValue">
+                        {{ data.signal }}
+                    </div>
+                    <div class="signal-reason" id="signalReason">{{ data.signal_reason }}</div>
+                </div>
+
+                <div class="stock-details">
+                    <div class="detail-box">
+                        <div class="label">Current Price</div>
+                        <div class="value" id="priceValue">
+                            {% if data.currency == "INR" %}
+                                ₹{{ data.price }}
+                            {% else %}
+                                ${{ data.price }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Price Change</div>
+                        <div class="value {% if data.change >= 0 %}positive{% else %}negative{% endif %}" id="changeValue">
+                            {{ data.change }}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Percentage Change</div>
+                        <div class="value {% if data.percent >= 0 %}positive{% else %}negative{% endif %}" id="percentValue">
+                            {{ data.percent }}%
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Status</div>
+                        <div class="value {% if data.change >= 0 %}positive{% else %}negative{% endif %}" id="statusValue">
+                            {% if data.change >= 0 %}Bullish{% else %}Bearish{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Sector</div>
+                        <div class="value" id="sectorValue">{{ data.sector }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Market Cap</div>
+                        <div class="value" id="marketCapValue">{{ data.market_cap }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">P/E Ratio</div>
+                        <div class="value" id="peValue">{{ data.pe_ratio }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Current Volume</div>
+                        <div class="value" id="volumeValue">{{ data.volume }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">RSI (14)</div>
+                        <div class="value" id="rsiValue">{{ data.rsi }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">20-Day Moving Average</div>
+                        <div class="value" id="ma20Value">
+                            {% if data.currency == "INR" and data.ma20 != "N/A" %}
+                                ₹{{ data.ma20 }}
+                            {% elif data.ma20 != "N/A" %}
+                                ${{ data.ma20 }}
+                            {% else %}
+                                {{ data.ma20 }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">MACD</div>
+                        <div class="value" id="macdValue">{{ data.macd }}</div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Signal Line</div>
+                        <div class="value" id="signalLineValue">{{ data.signal_line }}</div>
+                    </div>
+                </div>
+
+                <div class="stock-details">
+                    <div class="level-box">
+                        <div class="label">Support Levels</div>
+                        <div class="level-badges" id="supportLevelsBox">
+                            {% if data.support_levels and data.support_levels|length > 0 %}
+                                {% for level in data.support_levels %}
+                                    <span class="level-pill support-pill">{{ level }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="level-pill support-pill">N/A</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="level-box">
+                        <div class="label">Resistance Levels</div>
+                        <div class="level-badges" id="resistanceLevelsBox">
+                            {% if data.resistance_levels and data.resistance_levels|length > 0 %}
+                                {% for level in data.resistance_levels %}
+                                    <span class="level-pill resistance-pill">{{ level }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="level-pill resistance-pill">N/A</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">MACD Status</div>
+                        <div class="value
+                            {% if 'Bullish' in data.macd_status %}
+                                positive
+                            {% elif 'Bearish' in data.macd_status %}
+                                negative
+                            {% else %}
+                                neutral
+                            {% endif %}
+                        " id="macdStatusValue">
+                            {{ data.macd_status }}
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="label">Market View</div>
+                        <div class="value {% if data.change >= 0 %}positive{% else %}negative{% endif %}">
+                            {% if data.change >= 0 %}Positive Bias{% else %}Cautious Bias{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-title">Candlestick Chart (<span id="periodTitleCandle">{{ selected_period|upper }}</span>)</div>
+                    <div id="candlestickChart" class="candle-chart"></div>
+                </div>
+
+                <div class="volume-chart-box">
+                    <div class="chart-title">Volume Chart (<span id="periodTitleVolume">{{ selected_period|upper }}</span>)</div>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-title">Price Chart with Support / Resistance (<span id="periodTitle">{{ selected_period|upper }}</span>)</div>
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-title">MACD Chart (<span id="periodTitleMacd">{{ selected_period|upper }}</span>)</div>
+                    <canvas id="macdChart"></canvas>
+                    <div class="disclaimer">
+                        Intraday mode uses Yahoo Finance interval data. This is for educational use only, not financial advice.
+                    </div>
+                </div>
+
+                <div class="news-wrap">
+                    <div class="news-title">Latest News</div>
+                    <div id="newsContainer">
+                        {% if news and news|length > 0 %}
+                        <div class="news-grid">
+                            {% for article in news %}
+                            <div class="news-card">
+                                <h3>{{ article.title }}</h3>
+                                <div class="news-meta">{{ article.source }} | {{ article.published_at }}</div>
+                                <p>{{ article.description }}</p>
+                                <a href="{{ article.url }}" target="_blank" class="news-link">Read More</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="no-news">No recent news found for this stock.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="footer-note">
+                Built for learning, analysis, and project showcase. Always verify investment decisions independently.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const stockForm = document.getElementById('stockForm');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const searchBtn = document.getElementById('searchBtn');
+        const symbolInput = document.getElementById('symbolInput');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+
+        let currentSuggestions = [];
+        let activeSuggestionIndex = -1;
+        let suggestionDebounce = null;
+
+        function hideSuggestions() {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+            currentSuggestions = [];
+            activeSuggestionIndex = -1;
+        }
+
+        function renderSuggestions(items) {
+            currentSuggestions = items || [];
+            activeSuggestionIndex = -1;
+
+            if (!items || items.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            let html = '';
+            items.forEach((item, index) => {
+                html += `
+                    <div class="suggestion-item" data-index="${index}" data-symbol="${item.symbol}">
+                        <div class="suggestion-name">${item.name}</div>
+                        <div class="suggestion-symbol">${item.symbol}</div>
+                    </div>
+                `;
+            });
+
+            suggestionsBox.innerHTML = html;
+            suggestionsBox.style.display = 'block';
+
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const symbol = item.getAttribute('data-symbol');
+                    symbolInput.value = symbol;
+                    hideSuggestions();
+                    symbolInput.focus();
+                });
+            });
+        }
+
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`/suggest?q=${encodeURIComponent(query)}`);
+                const result = await response.json();
+                renderSuggestions(result.suggestions || []);
+            } catch (error) {
+                hideSuggestions();
+            }
+        }
+
+        if (symbolInput) {
+            symbolInput.addEventListener('input', function () {
+                const query = this.value.trim();
+
+                clearTimeout(suggestionDebounce);
+
+                if (query.length < 1) {
+                    hideSuggestions();
+                    return;
+                }
+
+                suggestionDebounce = setTimeout(() => {
+                    fetchSuggestions(query);
+                }, 200);
+            });
+
+            symbolInput.addEventListener('keydown', function (e) {
+                const items = document.querySelectorAll('.suggestion-item');
+
+                if (!items.length) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+                } else if (e.key === 'Enter') {
+                    if (activeSuggestionIndex >= 0 && currentSuggestions[activeSuggestionIndex]) {
+                        e.preventDefault();
+                        symbolInput.value = currentSuggestions[activeSuggestionIndex].symbol;
+                        hideSuggestions();
+                    }
+                    return;
+                } else if (e.key === 'Escape') {
+                    hideSuggestions();
+                    return;
+                } else {
+                    return;
+                }
+
+                items.forEach(item => item.classList.remove('active'));
+                if (items[activeSuggestionIndex]) {
+                    items[activeSuggestionIndex].classList.add('active');
+                }
+            });
+
+            symbolInput.addEventListener('blur', function () {
+                setTimeout(() => {
+                    hideSuggestions();
+                }, 150);
+            });
+
+            symbolInput.addEventListener('focus', function () {
+                const query = this.value.trim();
+                if (query.length >= 1) {
+                    fetchSuggestions(query);
+                }
+            });
+        }
+
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                symbolInput.value = chip.dataset.symbol;
+                symbolInput.focus();
+            });
+        });
+
+        if (stockForm) {
+            stockForm.addEventListener('submit', function () {
+                const symbolValue = symbolInput.value.trim();
+
+                if (!symbolValue) {
+                    return;
+                }
+
+                hideSuggestions();
+
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'flex';
+                }
+
+                if (searchBtn) {
+                    searchBtn.disabled = true;
+                    searchBtn.textContent = 'Analyzing...';
+                }
+            });
+        }
+
+        window.addEventListener('pageshow', function () {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+
+            if (searchBtn) {
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Analyze Now';
+            }
+        });
+    </script>
+
+    {% if data %}
+    <script>
+        let currentSymbol = {{ data.symbol | tojson }};
+        let currentPeriod = {{ selected_period | tojson }};
+
+        let labels = {{ chart_labels | tojson }};
+        let priceData = {{ chart_prices | tojson }};
+        let candleData = {{ candle_data | tojson }};
+        let volumeData = {{ volume_values | tojson }};
+        let volumeColors = {{ volume_colors | tojson }};
+        let macdData = {{ macd_values | tojson }};
+        let signalData = {{ signal_values | tojson }};
+        let supportLevels = {{ support_levels | tojson }};
+        let resistanceLevels = {{ resistance_levels | tojson }};
+
+        let priceChartInstance = null;
+        let volumeChartInstance = null;
+        let macdChartInstance = null;
+        let candlestickChartInstance = null;
+
+        function getValueClass(value) {
+            const num = parseFloat(value);
+            if (num > 0) return 'positive';
+            if (num < 0) return 'negative';
+            return 'neutral';
+        }
+
+        function getSignalClass(text) {
+            if (!text) return 'neutral';
+            if (text.includes('Buy') || text.includes('Bullish') || text.includes('Reversal')) return 'positive';
+            if (text.includes('Sell') || text.includes('Bearish') || text.includes('Caution')) return 'negative';
+            return 'neutral';
+        }
+
+        function formatCurrency(value, currency) {
+            if (value === "N/A" || value === null || value === undefined) return "N/A";
+            return currency === "INR" ? `₹${value}` : `$${value}`;
+        }
+
+        function renderNews(news) {
+            const newsContainer = document.getElementById('newsContainer');
+            if (!newsContainer) return;
+
+            if (!news || news.length === 0) {
+                newsContainer.innerHTML = '<div class="no-news">No recent news found for this stock.</div>';
+                return;
+            }
+
+            let html = '<div class="news-grid">';
+            news.forEach(article => {
+                html += `
+                    <div class="news-card">
+                        <h3>${article.title || 'No title'}</h3>
+                        <div class="news-meta">${article.source || 'Unknown'} | ${article.published_at || 'Unknown time'}</div>
+                        <p>${article.description || 'No description available.'}</p>
+                        <a href="${article.url || '#'}" target="_blank" class="news-link">Read More</a>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            newsContainer.innerHTML = html;
+        }
+
+        function renderLevelBadges(containerId, levels, type) {
+            const box = document.getElementById(containerId);
+            if (!box) return;
+
+            if (!levels || levels.length === 0) {
+                box.innerHTML = `<span class="level-pill ${type === 'support' ? 'support-pill' : 'resistance-pill'}">N/A</span>`;
+                return;
+            }
+
+            box.innerHTML = levels.map(level =>
+                `<span class="level-pill ${type === 'support' ? 'support-pill' : 'resistance-pill'}">${level}</span>`
+            ).join('');
+        }
+
+        function buildPriceDatasets(prices, supports, resistances) {
+            const datasets = [
+                {
+                    label: 'Closing Price',
+                    data: prices,
+                    borderColor: '#60a5fa',
+                    backgroundColor: 'rgba(96, 165, 250, 0.16)',
+                    fill: true,
+                    tension: 0.25,
+                    pointRadius: 0
+                }
+            ];
+
+            supports.forEach((level, index) => {
+                datasets.push({
+                    label: `Support ${index + 1}`,
+                    data: Array(prices.length).fill(level),
+                    borderColor: '#22c55e',
+                    borderDash: [6, 6],
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0
+                });
+            });
+
+            resistances.forEach((level, index) => {
+                datasets.push({
+                    label: `Resistance ${index + 1}`,
+                    data: Array(prices.length).fill(level),
+                    borderColor: '#ef4444',
+                    borderDash: [6, 6],
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0
+                });
+            });
+
+            return datasets;
+        }
+
+        function initCandlestickChart(initialData) {
+            const candleEl = document.querySelector("#candlestickChart");
+            if (!candleEl) return;
+
+            const annotationsY = [];
+
+            supportLevels.forEach(level => {
+                annotationsY.push({
+                    y: level,
+                    borderColor: '#22c55e',
+                    strokeDashArray: 4,
+                    label: {
+                        borderColor: '#22c55e',
+                        style: {
+                            color: '#fff',
+                            background: '#22c55e'
+                        },
+                        text: `Support ${level}`
+                    }
+                });
+            });
+
+            resistanceLevels.forEach(level => {
+                annotationsY.push({
+                    y: level,
+                    borderColor: '#ef4444',
+                    strokeDashArray: 4,
+                    label: {
+                        borderColor: '#ef4444',
+                        style: {
+                            color: '#fff',
+                            background: '#ef4444'
+                        },
+                        text: `Resistance ${level}`
+                    }
+                });
+            });
+
+            const options = {
+                series: [{
+                    data: initialData || []
+                }],
+                chart: {
+                    type: 'candlestick',
+                    height: 380,
+                    toolbar: { show: true },
+                    animations: { enabled: false },
+                    background: 'transparent'
+                },
+                theme: { mode: 'dark' },
+                xaxis: { type: 'category', labels: { style: { colors: '#94a3b8' } } },
+                yaxis: { tooltip: { enabled: true }, labels: { style: { colors: '#94a3b8' } } },
+                grid: { borderColor: 'rgba(255,255,255,0.08)' },
+                plotOptions: {
+                    candlestick: {
+                        colors: {
+                            upward: '#22c55e',
+                            downward: '#ef4444'
+                        }
+                    }
+                },
+                annotations: { yaxis: annotationsY }
+            };
+
+            candlestickChartInstance = new ApexCharts(candleEl, options);
+            candlestickChartInstance.render();
+        }
+
+        async function updateCandlestickChart(newCandleData, newSupports, newResistances) {
+            if (candlestickChartInstance) {
+                const annotationsY = [];
+
+                (newSupports || []).forEach(level => {
+                    annotationsY.push({
+                        y: level,
+                        borderColor: '#22c55e',
+                        strokeDashArray: 4,
+                        label: {
+                            borderColor: '#22c55e',
+                            style: { color: '#fff', background: '#22c55e' },
+                            text: `Support ${level}`
+                        }
+                    });
+                });
+
+                (newResistances || []).forEach(level => {
+                    annotationsY.push({
+                        y: level,
+                        borderColor: '#ef4444',
+                        strokeDashArray: 4,
+                        label: {
+                            borderColor: '#ef4444',
+                            style: { color: '#fff', background: '#ef4444' },
+                            text: `Resistance ${level}`
+                        }
+                    });
+                });
+
+                await candlestickChartInstance.updateOptions({
+                    annotations: { yaxis: annotationsY }
+                }, false, false);
+
+                await candlestickChartInstance.updateSeries([{ data: newCandleData || [] }], false);
+            }
+        }
+
+        function initCharts() {
+            const priceCanvas = document.getElementById('priceChart');
+            const volumeCanvas = document.getElementById('volumeChart');
+            const macdCanvas = document.getElementById('macdChart');
+
+            if (!priceCanvas || !volumeCanvas || !macdCanvas) return;
+
+            const priceCtx = priceCanvas.getContext('2d');
+            const volumeCtx = volumeCanvas.getContext('2d');
+            const macdCtx = macdCanvas.getContext('2d');
+
+            priceChartInstance = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: buildPriceDatasets(priceData, supportLevels, resistanceLevels)
+                },
+                options: {
+                    responsive: true,
+                    animation: false,
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { maxTicksLimit: 12, color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        }
+                    }
+                }
+            });
+
+            volumeChartInstance = new Chart(volumeCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Volume',
+                        data: volumeData,
+                        backgroundColor: volumeColors,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: false,
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { maxTicksLimit: 12, color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        }
+                    }
+                }
+            });
+
+            macdChartInstance = new Chart(macdCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'MACD',
+                            data: macdData,
+                            borderColor: '#22c55e',
+                            tension: 0.25,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Signal Line',
+                            data: signalData,
+                            borderColor: '#ef4444',
+                            tension: 0.25,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    animation: false,
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { maxTicksLimit: 12, color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.06)' }
+                        }
+                    }
+                }
+            });
+
+            initCandlestickChart(candleData);
+        }
+
+        function updateCharts(newLabels, newPrices, newVolumes, newVolumeColors, newMacd, newSignal, newSupports, newResistances) {
+            if (priceChartInstance) {
+                priceChartInstance.data.labels = newLabels || [];
+                priceChartInstance.data.datasets = buildPriceDatasets(newPrices || [], newSupports || [], newResistances || []);
+                priceChartInstance.update();
+            }
+
+            if (volumeChartInstance) {
+                volumeChartInstance.data.labels = newLabels || [];
+                volumeChartInstance.data.datasets[0].data = newVolumes || [];
+                volumeChartInstance.data.datasets[0].backgroundColor = newVolumeColors || [];
+                volumeChartInstance.update();
+            }
+
+            if (macdChartInstance) {
+                macdChartInstance.data.labels = newLabels || [];
+                macdChartInstance.data.datasets[0].data = newMacd || [];
+                macdChartInstance.data.datasets[1].data = newSignal || [];
+                macdChartInstance.update();
+            }
+        }
+
+        async function refreshLiveData() {
+            if (!currentSymbol) return;
+
+            try {
+                const response = await fetch(`/live-data/${encodeURIComponent(currentSymbol)}?period=${encodeURIComponent(currentPeriod)}`);
+                const result = await response.json();
+
+                if (!result.success) return;
+
+                const stock = result.data;
+
+                labels = result.chart_labels || [];
+                priceData = result.chart_prices || [];
+                candleData = result.candle_data || [];
+                volumeData = result.volume_values || [];
+                volumeColors = result.volume_colors || [];
+                macdData = result.macd_values || [];
+                signalData = result.signal_values || [];
+                supportLevels = result.support_levels || [];
+                resistanceLevels = result.resistance_levels || [];
+
+                document.getElementById('stockName').textContent = stock.name || 'N/A';
+                document.getElementById('stockSymbol').textContent = stock.symbol || 'N/A';
+                document.getElementById('signalValue').textContent = stock.signal || 'N/A';
+                document.getElementById('signalReason').textContent = stock.signal_reason || 'N/A';
+                document.getElementById('sectorValue').textContent = stock.sector || 'N/A';
+                document.getElementById('marketCapValue').textContent = stock.market_cap || 'N/A';
+                document.getElementById('peValue').textContent = stock.pe_ratio || 'N/A';
+                document.getElementById('volumeValue').textContent = stock.volume || 'N/A';
+                document.getElementById('rsiValue').textContent = stock.rsi || 'N/A';
+                document.getElementById('macdValue').textContent = stock.macd || 'N/A';
+                document.getElementById('signalLineValue').textContent = stock.signal_line || 'N/A';
+                document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+
+                renderLevelBadges('supportLevelsBox', supportLevels, 'support');
+                renderLevelBadges('resistanceLevelsBox', resistanceLevels, 'resistance');
+
+                const aiSummaryBox = document.getElementById('aiSummaryBox');
+                const aiSummaryEl = document.getElementById('aiSummary');
+
+                if (aiSummaryEl && result.ai_summary) {
+                    aiSummaryEl.textContent = result.ai_summary;
+                    aiSummaryBox.style.display = 'block';
+                } else if (aiSummaryBox) {
+                    aiSummaryBox.style.display = 'none';
+                }
+
+                document.getElementById('priceValue').textContent = formatCurrency(stock.price, stock.currency);
+                document.getElementById('ma20Value').textContent =
+                    stock.ma20 === "N/A" ? "N/A" : formatCurrency(stock.ma20, stock.currency);
+
+                const changeEl = document.getElementById('changeValue');
+                changeEl.textContent = stock.change ?? 'N/A';
+                changeEl.className = `value ${getValueClass(stock.change)}`;
+
+                const percentEl = document.getElementById('percentValue');
+                percentEl.textContent = `${stock.percent ?? 'N/A'}%`;
+                percentEl.className = `value ${getValueClass(stock.percent)}`;
+
+                const statusEl = document.getElementById('statusValue');
+                statusEl.textContent = parseFloat(stock.change) >= 0 ? 'Bullish' : 'Bearish';
+                statusEl.className = `value ${getValueClass(stock.change)}`;
+
+                const signalEl = document.getElementById('signalValue');
+                signalEl.className = `signal-value ${getSignalClass(stock.signal)}`;
+
+                const macdStatusEl = document.getElementById('macdStatusValue');
+                macdStatusEl.textContent = stock.macd_status || 'N/A';
+                macdStatusEl.className = `value ${getSignalClass(stock.macd_status)}`;
+
+                document.getElementById('periodTitle').textContent = (result.selected_period || currentPeriod).toUpperCase();
+                document.getElementById('periodTitleMacd').textContent = (result.selected_period || currentPeriod).toUpperCase();
+                document.getElementById('periodTitleCandle').textContent = (result.selected_period || currentPeriod).toUpperCase();
+                document.getElementById('periodTitleVolume').textContent = (result.selected_period || currentPeriod).toUpperCase();
+                document.getElementById('modeBadge').textContent = result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE';
+
+                const resolvedTextEl = document.getElementById('resolvedText');
+                if (stock.resolved_from && stock.resolved_from.toUpperCase() !== stock.symbol) {
+                    resolvedTextEl.style.display = 'block';
+                    resolvedTextEl.innerHTML = `Showing result for "<b>${stock.resolved_from}</b>" → ${stock.symbol}`;
+                } else {
+                    resolvedTextEl.style.display = 'none';
+                }
+
+                renderNews(result.news);
+                updateCharts(
+                    labels,
+                    priceData,
+                    volumeData,
+                    volumeColors,
+                    macdData,
+                    signalData,
+                    supportLevels,
+                    resistanceLevels
+                );
+                await updateCandlestickChart(candleData, supportLevels, resistanceLevels);
+            } catch (error) {
+                console.log('Live refresh error:', error);
+            }
+        }
+
+        initCharts();
+        setInterval(refreshLiveData, 15000);
+
+        document.querySelectorAll('input[name="period"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                currentPeriod = document.querySelector('input[name="period"]:checked').value;
+                refreshLiveData();
+            });
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
