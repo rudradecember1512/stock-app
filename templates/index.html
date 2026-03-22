@@ -3,26 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Analyzer Pro</title>
+    <title>Stock Analyzer Pro | Live Market Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         :root {
-            --bg-1: #0b1020;
-            --bg-2: #111827;
-            --panel: rgba(17, 24, 39, 0.78);
-            --panel-2: rgba(15, 23, 42, 0.88);
+            --bg-1: #06131a;
+            --bg-2: #0d1d2a;
+            --bg-3: #15283b;
+            --panel: rgba(8, 21, 31, 0.8);
+            --panel-2: rgba(13, 29, 42, 0.92);
             --card: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text: #e5e7eb;
-            --muted: #94a3b8;
-            --primary: #3b82f6;
-            --primary-2: #60a5fa;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-            --radius-xl: 24px;
+            --card-border: rgba(255, 255, 255, 0.11);
+            --text: #eef6f4;
+            --muted: #9bb3be;
+            --primary: #26c6a0;
+            --primary-2: #49e2b4;
+            --accent: #ffb84d;
+            --accent-soft: #ffdca2;
+            --success: #30d582;
+            --danger: #ff6b6b;
+            --warning: #ffb84d;
+            --shadow: 0 28px 80px rgba(1, 8, 15, 0.42);
+            --radius-xl: 28px;
             --radius-lg: 18px;
             --radius-md: 14px;
         }
@@ -31,23 +37,53 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Inter, Arial, sans-serif;
+            font-family: "Manrope", Arial, sans-serif;
         }
 
         body {
             min-height: 100vh;
             color: var(--text);
             background:
-                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
-                radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 24%),
-                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+                radial-gradient(circle at top left, rgba(38, 198, 160, 0.18), transparent 28%),
+                radial-gradient(circle at 85% 10%, rgba(255, 184, 77, 0.16), transparent 22%),
+                linear-gradient(155deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
             padding: 28px 16px 40px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(24px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            width: 340px;
+            height: 340px;
+            top: 90px;
+            left: -120px;
+            background: rgba(38, 198, 160, 0.12);
+        }
+
+        body::after {
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            bottom: 60px;
+            background: rgba(255, 184, 77, 0.12);
         }
 
         .page-shell {
             width: 100%;
             max-width: 1250px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .topbar {
@@ -57,6 +93,11 @@
             margin-bottom: 22px;
             gap: 14px;
             flex-wrap: wrap;
+            padding: 14px 18px;
+            background: rgba(6, 19, 26, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 999px;
+            backdrop-filter: blur(18px);
         }
 
         .brand {
@@ -69,20 +110,33 @@
             width: 52px;
             height: 52px;
             border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .brand-logo::after {
+            content: "\2197";
+            position: absolute;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: var(--shadow);
         }
 
         .brand-text h1 {
             font-size: 28px;
             line-height: 1.1;
             color: white;
+            font-family: "Space Grotesk", Arial, sans-serif;
+            letter-spacing: -0.04em;
         }
 
         .brand-text p {
@@ -92,24 +146,71 @@
         }
 
         .topbar-badge {
-            background: rgba(59, 130, 246, 0.12);
-            color: #bfdbfe;
-            border: 1px solid rgba(59, 130, 246, 0.28);
+            background: rgba(255, 184, 77, 0.12);
+            color: var(--accent-soft);
+            border: 1px solid rgba(255, 184, 77, 0.28);
             padding: 10px 14px;
             border-radius: 999px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-link {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: 0.25s;
+        }
+
+        .topbar-link:hover {
+            background: rgba(38, 198, 160, 0.12);
+            border-color: rgba(38, 198, 160, 0.28);
         }
 
         .hero {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(17, 24, 39, 0.92));
+            background:
+                linear-gradient(135deg, rgba(255, 184, 77, 0.07), transparent 35%),
+                linear-gradient(135deg, rgba(10, 33, 45, 0.95), rgba(13, 29, 42, 0.95));
             border: 1px solid var(--card-border);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow);
-            padding: 26px;
+            padding: 30px;
             margin-bottom: 22px;
             overflow: hidden;
             position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+            pointer-events: none;
         }
 
         .hero::after {
@@ -120,7 +221,7 @@
             width: 220px;
             height: 220px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.18), transparent 65%);
+            background: radial-gradient(circle, rgba(38, 198, 160, 0.18), transparent 65%);
             pointer-events: none;
         }
 
@@ -132,17 +233,45 @@
         }
 
         .hero h2 {
-            font-size: 34px;
+            font-size: 46px;
             line-height: 1.15;
             margin-bottom: 12px;
             color: white;
+            max-width: 720px;
+            font-family: "Space Grotesk", Arial, sans-serif;
+            letter-spacing: -0.05em;
         }
 
         .hero p {
             color: var(--muted);
-            line-height: 1.7;
-            font-size: 15px;
+            line-height: 1.8;
+            font-size: 16px;
             max-width: 700px;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            margin-bottom: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--accent-soft);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .hero-kicker::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-2);
+            box-shadow: 0 0 14px rgba(73, 226, 180, 0.6);
         }
 
         .hero-points {
@@ -150,30 +279,95 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 18px;
+            margin-bottom: 20px;
         }
 
         .hero-point {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: var(--text);
             padding: 10px 14px;
             border-radius: 999px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 0 18px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 800;
+            transition: 0.25s;
+        }
+
+        .hero-action-primary {
+            color: #06211a;
+            background: linear-gradient(135deg, var(--accent), #ffd27c);
+            box-shadow: 0 16px 28px rgba(255, 184, 77, 0.22);
+        }
+
+        .hero-action-secondary {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .hero-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .metric-card {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .metric-value {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            font-family: "Space Grotesk", Arial, sans-serif;
+        }
+
+        .metric-label {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 13px;
         }
 
         .hero-side {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 24px;
+            padding: 22px;
+            position: relative;
         }
 
         .hero-side-title {
-            color: #bfdbfe;
+            color: var(--accent-soft);
             font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.6px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
             margin-bottom: 14px;
         }
 
@@ -199,6 +393,33 @@
         .hero-side-item span {
             color: var(--muted);
             font-size: 13px;
+        }
+
+        .market-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .market-tile {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(6, 19, 26, 0.56);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .market-tile strong {
+            display: block;
+            color: white;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .market-tile span {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
         }
 
         .main-panel {
@@ -258,7 +479,7 @@
         button {
             border: none;
             background: linear-gradient(135deg, var(--primary), var(--primary-2));
-            color: white;
+            color: #03251d;
             font-size: 15px;
             font-weight: 700;
             border-radius: 16px;
@@ -266,12 +487,12 @@
             cursor: pointer;
             transition: 0.25s;
             min-height: 54px;
-            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.28);
+            box-shadow: 0 12px 26px rgba(38, 198, 160, 0.28);
         }
 
         button:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(59, 130, 246, 0.32);
+            box-shadow: 0 16px 30px rgba(38, 198, 160, 0.34);
         }
 
         button:disabled {
@@ -691,6 +912,52 @@
             line-height: 1.6;
         }
 
+        .page-footer {
+            margin-top: 20px;
+            padding: 22px 24px;
+            border-radius: 24px;
+            background: rgba(6, 19, 26, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .page-footer p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: 0.25s;
+        }
+
+        .footer-link:hover {
+            background: rgba(255, 184, 77, 0.12);
+            border-color: rgba(255, 184, 77, 0.25);
+        }
+
+        footer[style] {
+            display: none !important;
+        }
+
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -747,6 +1014,11 @@
             .stock-details {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .hero-metrics,
+            .market-strip {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 760px) {
@@ -764,7 +1036,7 @@
             }
 
             .hero h2 {
-                font-size: 28px;
+                font-size: 34px;
             }
 
             .search-row {
@@ -795,6 +1067,20 @@
             .signal-value {
                 font-size: 25px;
             }
+
+            .topbar {
+                border-radius: 28px;
+            }
+
+            .topbar-right,
+            .topbar-nav,
+            .hero-actions {
+                width: 100%;
+            }
+
+            .page-footer {
+                padding: 18px;
+            }
         }
     </style>
 </head>
@@ -813,20 +1099,29 @@
                 <div class="brand-logo">↗</div>
                 <div class="brand-text">
                     <h1>Stock Analyzer Pro</h1>
-                    <p>Live charts, technical indicators, news, and AI-based stock summary</p>
+                    <p>Live charts, market structure, and fast insight for Indian and US stocks</p>
                 </div>
             </div>
-            <div class="topbar-badge">LIVE ON RENDER</div>
+            <div class="topbar-right">
+                <div class="topbar-nav">
+                    <a class="topbar-link" href="#analyzer">Analyzer</a>
+                    <a class="topbar-link" href="/privacy">Privacy</a>
+                    <a class="topbar-link" href="/terms">Terms</a>
+                    <a class="topbar-link" href="/contact">Contact</a>
+                </div>
+                <div class="topbar-badge">REAL-TIME REFRESH</div>
+            </div>
         </div>
 
         <div class="hero">
             <div class="hero-grid">
                 <div>
-                    <h2>Analyze stocks with charts, indicators, volume and key levels</h2>
+                    <div class="hero-kicker">Market Intelligence Desk</div>
+                    <h2>Turn a stock symbol into a sharp trading dashboard in seconds.</h2>
                     <p>
-                        Search Indian and US stocks by name or symbol, view candlestick charts,
-                        support/resistance levels, MACD, RSI, recent news, and a quick AI summary
-                        in one clean dashboard.
+                        Search by company name or ticker and get price action, candlesticks, volume,
+                        support and resistance, MACD, RSI, recent headlines, and an AI summary in one
+                        focused interface built for fast scanning.
                     </p>
 
                     <div class="hero-points">
@@ -835,6 +1130,24 @@
                         <div class="hero-point">Support / Resistance</div>
                         <div class="hero-point">Autocomplete Search</div>
                         <div class="hero-point">Live Refresh</div>
+                    </div>
+                    <div class="hero-actions">
+                        <a class="hero-action hero-action-primary" href="#analyzer">Start Analyzing</a>
+                        <a class="hero-action hero-action-secondary" href="/contact">Request Features</a>
+                    </div>
+                    <div class="hero-metrics">
+                        <div class="metric-card">
+                            <div class="metric-value">2 Markets</div>
+                            <div class="metric-label">Track both US and Indian listed names in the same flow.</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">15s</div>
+                            <div class="metric-label">Automatic refresh keeps the dashboard feeling live during intraday use.</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">1 View</div>
+                            <div class="metric-label">Indicators, levels, charts, and news stay together instead of split across tabs.</div>
+                        </div>
                     </div>
                 </div>
 
@@ -854,12 +1167,26 @@
                             <span>Switch between 1D, 5D, 1M, 3M, 6M and 1Y</span>
                         </div>
                     </div>
+                    <div class="market-strip">
+                        <div class="market-tile">
+                            <strong>Momentum</strong>
+                            <span>See whether price and MACD are moving together or starting to diverge.</span>
+                        </div>
+                        <div class="market-tile">
+                            <strong>Levels</strong>
+                            <span>Support and resistance are surfaced visually instead of buried in raw data.</span>
+                        </div>
+                        <div class="market-tile">
+                            <strong>Context</strong>
+                            <span>Recent news sits beside the chart so moves are easier to interpret.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="main-panel">
-            <div class="section-title">Search Stock</div>
+        <div class="main-panel" id="analyzer">
+            <div class="section-title">Start Analysis</div>
 
             <form method="POST" id="stockForm" autocomplete="off">
                 <div class="search-wrapper">
@@ -917,11 +1244,11 @@
 
             {% if not data and not error_message %}
             <div class="empty-state">
-                <div class="empty-icon">📈</div>
+                <div class="empty-icon">&#128200;</div>
                 <h2>Search any stock</h2>
                 <p>
                     Enter a stock name or symbol to view candlestick chart, support/resistance,
-                    volume, RSI, MACD, AI summary, and latest news — all in one modern dashboard.
+                    volume, RSI, MACD, AI summary, and latest news, all in one modern dashboard.
                 </p>
             </div>
             {% endif %}
@@ -1151,6 +1478,15 @@
 
             <div class="footer-note">
                 Built for learning, analysis, and project showcase. Always verify investment decisions independently.
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <p>&copy; 2026 Stock Analyzer. Cleaner signals, faster context.</p>
+            <div class="footer-links">
+                <a class="footer-link" href="/privacy">Privacy Policy</a>
+                <a class="footer-link" href="/terms">Terms</a>
+                <a class="footer-link" href="/contact">Contact</a>
             </div>
         </div>
     </div>

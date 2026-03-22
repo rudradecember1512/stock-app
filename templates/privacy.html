@@ -1,11 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Privacy Policy</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Stock Analyzer Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #06131a;
+            --bg-2: #0d1d2a;
+            --bg-3: #15283b;
+            --panel: rgba(8, 21, 31, 0.82);
+            --card: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #eef6f4;
+            --muted: #9bb3be;
+            --primary: #26c6a0;
+            --accent: #ffb84d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Manrope", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(38, 198, 160, 0.16), transparent 28%),
+                radial-gradient(circle at 85% 10%, rgba(255, 184, 77, 0.12), transparent 22%),
+                linear-gradient(155deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+            padding: 28px 16px 40px;
+        }
+
+        .shell {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .topbar,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar {
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .brand h1 {
+            font-family: "Space Grotesk", Arial, sans-serif;
+            font-size: 26px;
+            letter-spacing: -0.04em;
+        }
+
+        .brand p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav a,
+        .cta {
+            text-decoration: none;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .hero {
+            padding: 34px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            color: #ffdca2;
+            background: rgba(255, 184, 77, 0.1);
+            border: 1px solid rgba(255, 184, 77, 0.18);
+            padding: 9px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero h2 {
+            font-family: "Space Grotesk", Arial, sans-serif;
+            font-size: 46px;
+            line-height: 1.05;
+            letter-spacing: -0.05em;
+            max-width: 620px;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            max-width: 680px;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .panel {
+            padding: 28px;
+        }
+
+        .content {
+            display: grid;
+            gap: 16px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 22px;
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 760px) {
+            .hero,
+            .panel {
+                padding: 20px;
+            }
+
+            .hero h2 {
+                font-size: 34px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>Privacy Policy</h1>
-<p>This website uses cookies and third-party services like Google AdSense.</p>
-<p>We do not store personal data.</p>
+    <div class="shell">
+        <div class="topbar">
+            <div class="brand">
+                <div class="logo">&#8599;</div>
+                <div>
+                    <h1>Stock Analyzer Pro</h1>
+                    <p>Simple privacy details for a market analysis app.</p>
+                </div>
+            </div>
+            <div class="nav">
+                <a href="/">Back to App</a>
+                <a href="/terms">Terms</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+
+        <div class="hero panel">
+            <div class="eyebrow">Privacy Policy</div>
+            <h2>What this site uses and what it does not keep.</h2>
+            <p>
+                This page explains the basic privacy posture of Stock Analyzer Pro in plain language.
+                It is intended for transparency and should be expanded if the app starts collecting
+                user accounts, payments, analytics, or stored portfolios.
+            </p>
+        </div>
+
+        <div class="panel content">
+            <div class="card">
+                <h3>Data Usage</h3>
+                <p>
+                    Stock Analyzer Pro processes the symbol or company name you enter so it can fetch
+                    market data, charts, and related news. The app is designed for lookup and analysis,
+                    not for maintaining a personal user profile.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Third-Party Services</h3>
+                <p>
+                    The site may use third-party providers for stock quotes, market data, news, chart
+                    rendering, hosting, and advertising. Those providers may process request data
+                    according to their own terms and privacy policies.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Stored Information</h3>
+                <p>
+                    This version of the app does not present user accounts or a saved portfolio
+                    feature. If that changes, this policy should be updated to explain what is stored,
+                    for how long, and how users can request deletion.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Cookies and Analytics</h3>
+                <p>
+                    Hosting platforms, ads, or embedded services may use cookies or similar
+                    technologies. If you add analytics or advertising beyond basic hosting, document
+                    those tools clearly here.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">Educational market dashboards are not a substitute for regulated financial advice.</div>
+    </div>
 </body>
 </html>
