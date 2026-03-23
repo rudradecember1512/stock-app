@@ -942,6 +942,35 @@
             position: relative;
         }
 
+        .hero-search-panel {
+            margin: 26px auto 0;
+            max-width: 760px;
+            padding: 18px;
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at top right, rgba(73, 226, 180, 0.12), transparent 30%),
+                linear-gradient(145deg, rgba(8, 24, 34, 0.94), rgba(10, 21, 31, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-search-kicker {
+            color: var(--accent-soft);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-search-panel .period-buttons {
+            justify-content: center;
+        }
+
+        .hero-search-panel .quick-chips {
+            justify-content: center;
+        }
+
         .search-row {
             display: grid;
             grid-template-columns: 1fr auto;
@@ -1924,6 +1953,140 @@
             margin-bottom: 18px;
         }
 
+        .result-summary-card {
+            padding: 24px;
+            margin-bottom: 18px;
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at top right, rgba(255, 184, 77, 0.12), transparent 28%),
+                linear-gradient(145deg, rgba(9, 20, 28, 0.96), rgba(18, 31, 43, 0.94));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+        }
+
+        .result-summary-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .result-summary-kicker {
+            color: var(--accent-soft);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .result-summary-title {
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .result-summary-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .verdict-pill {
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            color: white;
+        }
+
+        .verdict-buy {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(22, 163, 74, 0.16));
+            border: 1px solid rgba(34, 197, 94, 0.28);
+        }
+
+        .verdict-sell {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.16));
+            border: 1px solid rgba(239, 68, 68, 0.28);
+        }
+
+        .verdict-hold {
+            background: linear-gradient(135deg, rgba(255, 184, 77, 0.22), rgba(217, 119, 6, 0.16));
+            border: 1px solid rgba(255, 184, 77, 0.28);
+        }
+
+        .result-summary-grid {
+            display: grid;
+            grid-template-columns: 1.1fr repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .result-summary-item {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .result-summary-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-summary-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .result-reason-box {
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .result-reason-text {
+            color: #dbe7f0;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+
+        .quick-intervals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .quick-interval {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: #dbe7f0;
+            box-shadow: none;
+            min-height: auto;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .quick-interval.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #03251d;
+            border-color: transparent;
+        }
+
         .signal-title {
             font-size: 14px;
             color: var(--muted);
@@ -2207,7 +2370,8 @@
             .pro-grid,
             .desk-grid,
             .feature-ribbon,
-            .portfolio-summary {
+            .portfolio-summary,
+            .result-summary-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -2283,7 +2447,8 @@
             .structure-grid,
             .desk-mini-grid,
             .feature-ribbon,
-            .portfolio-summary {
+            .portfolio-summary,
+            .result-summary-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -2315,8 +2480,8 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-box">
             <div class="spinner"></div>
-            <div class="loading-text">Fetching stock data...</div>
-            <div class="sub-loading-text">Please wait while we analyze the stock</div>
+            <div class="loading-text">Analyzing stock with AI...</div>
+            <div class="sub-loading-text">Preparing verdict, confidence, chart, and reasoning</div>
         </div>
     </div>
 
@@ -2376,7 +2541,7 @@
                 <div class="headline-chip">Candlesticks</div>
                 <div class="headline-chip">S1 / S2 / R1 / R2</div>
                 <div class="headline-chip">Momentum Stack</div>
-                <div class="headline-chip">1 Second Refresh</div>
+                <div class="headline-chip">15 Second Refresh</div>
             </div>
         </div>
 
@@ -2473,6 +2638,62 @@
                     </div>
                 </div>
             </div>
+            <form method="POST" id="stockForm" autocomplete="off" class="hero-search-panel">
+                <div class="hero-search-kicker">Search Any Stock</div>
+                <div class="search-wrapper">
+                    <div class="search-row">
+                        <input type="text" id="symbolInput" name="symbol" placeholder="Enter stock name or ticker (e.g., TCS, RELIANCE, INFY)" required>
+                        <button type="submit" id="searchBtn">Analyze Now</button>
+                    </div>
+                    <div class="suggestions-box" id="suggestionsBox"></div>
+                </div>
+
+                <div class="quick-chips">
+                    <div class="chip" data-symbol="AAPL">AAPL</div>
+                    <div class="chip" data-symbol="TSLA">TSLA</div>
+                    <div class="chip" data-symbol="NVDA">NVDA</div>
+                    <div class="chip" data-symbol="RELIANCE.NS">RELIANCE.NS</div>
+                    <div class="chip" data-symbol="TCS.NS">TCS.NS</div>
+                    <div class="chip" data-symbol="INFY.NS">INFY.NS</div>
+                    <div class="chip" data-symbol="SBIN.NS">SBIN.NS</div>
+                    <div class="chip" data-symbol="M&M.NS">M&M.NS</div>
+                </div>
+
+                <div class="period-buttons">
+                    <label>
+                        <input type="radio" name="period" value="1min" {% if selected_period == '1min' %}checked{% endif %}>
+                        <span class="period-tag">1 Min</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="5min" {% if selected_period == '5min' %}checked{% endif %}>
+                        <span class="period-tag">5 Min</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="15min" {% if selected_period == '15min' %}checked{% endif %}>
+                        <span class="period-tag">15 Min</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="1h" {% if selected_period == '1h' %}checked{% endif %}>
+                        <span class="period-tag">1 Hour</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="1d" {% if selected_period == '1d' %}checked{% endif %}>
+                        <span class="period-tag">1 Day</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="5d" {% if selected_period == '5d' %}checked{% endif %}>
+                        <span class="period-tag">1 Week</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="1mo" {% if selected_period == '1mo' %}checked{% endif %}>
+                        <span class="period-tag">1 Month</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="period" value="6mo" {% if selected_period == '6mo' %}checked{% endif %}>
+                        <span class="period-tag">6 Month</span>
+                    </label>
+                </div>
+            </form>
         </div>
 
         <div class="main-panel">
@@ -2524,7 +2745,7 @@
         </div>
 
         <div class="main-panel" id="analyzer">
-            <div class="section-title">Start Analysis</div>
+            <div class="section-title">Analysis Workspace</div>
 
             <div class="tool-row">
                 <div class="tool-card">
@@ -2538,62 +2759,6 @@
                     <div class="saved-list" id="favoriteSearches"></div>
                 </div>
             </div>
-
-            <form method="POST" id="stockForm" autocomplete="off">
-                <div class="search-wrapper">
-                    <div class="search-row">
-                        <input type="text" id="symbolInput" name="symbol" placeholder="Enter stock name or symbol (e.g. Apple, AAPL, Reliance, RELIANCE.NS)" required>
-                        <button type="submit" id="searchBtn">Analyze Now</button>
-                    </div>
-                    <div class="suggestions-box" id="suggestionsBox"></div>
-                </div>
-
-                <div class="quick-chips">
-                    <div class="chip" data-symbol="AAPL">AAPL</div>
-                    <div class="chip" data-symbol="TSLA">TSLA</div>
-                    <div class="chip" data-symbol="NVDA">NVDA</div>
-                    <div class="chip" data-symbol="RELIANCE.NS">RELIANCE.NS</div>
-                    <div class="chip" data-symbol="TCS.NS">TCS.NS</div>
-                    <div class="chip" data-symbol="INFY.NS">INFY.NS</div>
-                    <div class="chip" data-symbol="SBIN.NS">SBIN.NS</div>
-                    <div class="chip" data-symbol="M&M.NS">M&M.NS</div>
-                </div>
-
-                <div class="period-buttons">
-                    <label>
-                        <input type="radio" name="period" value="1min" {% if selected_period == '1min' %}checked{% endif %}>
-                        <span class="period-tag">1 Min</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="5min" {% if selected_period == '5min' %}checked{% endif %}>
-                        <span class="period-tag">5 Min</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="15min" {% if selected_period == '15min' %}checked{% endif %}>
-                        <span class="period-tag">15 Min</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="1h" {% if selected_period == '1h' %}checked{% endif %}>
-                        <span class="period-tag">1 Hour</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="1d" {% if selected_period == '1d' %}checked{% endif %}>
-                        <span class="period-tag">1 Day</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="5d" {% if selected_period == '5d' %}checked{% endif %}>
-                        <span class="period-tag">5 Day</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="1mo" {% if selected_period == '1mo' %}checked{% endif %}>
-                        <span class="period-tag">1 Month</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="period" value="6mo" {% if selected_period == '6mo' %}checked{% endif %}>
-                        <span class="period-tag">6 Month</span>
-                    </label>
-                </div>
-            </form>
 
             {% if error_message %}
             <div class="error-box" id="errorBox">{{ error_message }}</div>
@@ -2616,6 +2781,41 @@
             <div class="live-badge">LIVE AUTO REFRESH EVERY 15 SECONDS</div>
 
             <div class="stock-card" id="stockCard">
+                <div class="result-summary-card">
+                    <div class="result-summary-head">
+                        <div>
+                            <div class="result-summary-kicker">Structured Result</div>
+                            <div class="result-summary-title" id="summaryStockTitle">{{ data.name }}</div>
+                            <div class="result-summary-subtitle" id="summaryTickerValue">{{ data.symbol }}</div>
+                        </div>
+                        <div class="verdict-pill verdict-hold" id="summaryVerdictPill">{{ data.signal }}</div>
+                    </div>
+                    <div class="result-summary-grid">
+                        <div class="result-summary-item">
+                            <div class="result-summary-label">Stock Name & Ticker</div>
+                            <div class="result-summary-value" id="summaryNameValue">{{ data.name }} ({{ data.symbol }})</div>
+                        </div>
+                        <div class="result-summary-item">
+                            <div class="result-summary-label">Current Price</div>
+                            <div class="result-summary-value" id="summaryPriceValue">
+                                {% if data.currency == "INR" %}Rs {{ data.price }}{% else %}${{ data.price }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="result-summary-item">
+                            <div class="result-summary-label">AI Verdict</div>
+                            <div class="result-summary-value" id="summaryVerdictText">{{ data.signal }}</div>
+                        </div>
+                        <div class="result-summary-item">
+                            <div class="result-summary-label">Confidence Score</div>
+                            <div class="result-summary-value" id="summaryConfidenceValue">{{ data.setup_score }}%</div>
+                        </div>
+                    </div>
+                    <div class="result-reason-box">
+                        <div class="result-summary-label">Key Insights / Reasoning</div>
+                        <div class="result-reason-text" id="summaryReasonValue">{{ data.signal_reason }}</div>
+                    </div>
+                </div>
+
                 <div class="stock-header">
                     <div>
                         <div class="stock-name" id="stockName">{{ data.name }}</div>
@@ -2641,7 +2841,7 @@
                 </div>
 
                 <div class="ai-summary-box" id="aiSummaryBox" {% if not ai_summary %}style="display:none;"{% endif %}>
-                    <div class="ai-summary-title">AI SUMMARY</div>
+                    <div class="ai-summary-title">WHY THIS STOCK?</div>
                     <div class="ai-summary-text" id="aiSummary">{{ ai_summary if ai_summary else '' }}</div>
                 </div>
 
@@ -3066,6 +3266,11 @@
                 <div class="chart-box">
                     <div class="chart-toolbar">
                         <div class="chart-title">Price Chart with Professional Overlays (<span id="periodTitle">{{ data.display_period }}</span>)</div>
+                        <div class="quick-intervals">
+                            <button type="button" class="quick-interval" data-quick-period="1d">1D</button>
+                            <button type="button" class="quick-interval" data-quick-period="5d">1W</button>
+                            <button type="button" class="quick-interval" data-quick-period="1mo">1M</button>
+                        </div>
                         <div class="chart-toggle-row">
                             <label class="chart-toggle"><input type="checkbox" id="toggleEma20" checked> EMA20</label>
                             <label class="chart-toggle"><input type="checkbox" id="toggleEma50" checked> EMA50</label>
@@ -3782,6 +3987,7 @@
             currency: {{ data.currency | tojson }},
             signal: {{ data.signal | tojson }},
             signal_reason: {{ data.signal_reason | tojson }},
+            setup_score: {{ data.setup_score | tojson }},
             setup_label: {{ data.setup_label | tojson }},
             display_period: {{ data.display_period | tojson }},
             ema20: {{ data.ema20 | tojson }},
@@ -3817,6 +4023,47 @@
             if (text.includes('Buy') || text.includes('Bullish') || text.includes('Reversal')) return 'positive';
             if (text.includes('Sell') || text.includes('Bearish') || text.includes('Caution')) return 'negative';
             return 'neutral';
+        }
+
+        function getVerdictMeta(signal) {
+            const text = String(signal || '').toLowerCase();
+            if (text.includes('buy') || text.includes('bullish') || text.includes('reversal')) {
+                return { text: 'BUY ✅', pillClass: 'verdict-buy' };
+            }
+            if (text.includes('sell') || text.includes('bearish')) {
+                return { text: 'SELL ❌', pillClass: 'verdict-sell' };
+            }
+            return { text: 'HOLD ⚠️', pillClass: 'verdict-hold' };
+        }
+
+        function updateVerdictSummary(stock) {
+            const summaryStockTitle = document.getElementById('summaryStockTitle');
+            const summaryTickerValue = document.getElementById('summaryTickerValue');
+            const summaryNameValue = document.getElementById('summaryNameValue');
+            const summaryPriceValue = document.getElementById('summaryPriceValue');
+            const summaryVerdictText = document.getElementById('summaryVerdictText');
+            const summaryConfidenceValue = document.getElementById('summaryConfidenceValue');
+            const summaryReasonValue = document.getElementById('summaryReasonValue');
+            const summaryVerdictPill = document.getElementById('summaryVerdictPill');
+            if (!summaryStockTitle || !summaryVerdictPill) return;
+
+            const verdict = getVerdictMeta(stock.signal);
+            summaryStockTitle.textContent = stock.name || 'N/A';
+            summaryTickerValue.textContent = stock.symbol || 'N/A';
+            summaryNameValue.textContent = `${stock.name || 'Stock'} (${stock.symbol || 'N/A'})`;
+            summaryPriceValue.textContent = formatCurrency(stock.price, stock.currency);
+            summaryVerdictText.textContent = verdict.text;
+            summaryConfidenceValue.textContent = `${stock.setup_score ?? 0}%`;
+            summaryReasonValue.textContent = stock.signal_reason || 'Indicators are mixed.';
+            summaryVerdictPill.textContent = verdict.text;
+            summaryVerdictPill.className = `verdict-pill ${verdict.pillClass}`;
+        }
+
+        function syncQuickIntervals() {
+            const activePeriod = currentPeriod;
+            document.querySelectorAll('[data-quick-period]').forEach(button => {
+                button.classList.toggle('active', button.getAttribute('data-quick-period') === activePeriod);
+            });
         }
 
         function formatCurrency(value, currency) {
@@ -4001,6 +4248,7 @@
 
             if (scoreFill) scoreFill.style.width = `${stock.setup_score || 0}%`;
             if (scoreValue) scoreValue.innerHTML = `${stock.setup_score || 0}<span>/100</span>`;
+            updateVerdictSummary(stock);
             if (setupLabelValue) setupLabelValue.textContent = stock.setup_label || 'Balanced';
             if (riskLevelValue) riskLevelValue.textContent = stock.risk_level || 'Balanced';
             if (newsSentimentValue) newsSentimentValue.textContent = stock.news_sentiment || 'Mixed';
@@ -4609,6 +4857,7 @@
                 document.getElementById('periodTitleVolume').textContent = displayPeriod;
                 document.getElementById('periodTitleStoch').textContent = displayPeriod;
                 document.getElementById('modeBadge').textContent = result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE';
+                syncQuickIntervals();
                 refreshStrategistDesk(currentStockSnapshot);
                 syncPortfolioPrice(currentStockSnapshot);
 
@@ -4671,12 +4920,25 @@
         renderChecklist(checklistItems);
         initCharts();
         populateBenchmarkSelect();
+        syncQuickIntervals();
         refreshStrategistDesk(currentStockSnapshot);
         syncPortfolioPrice(currentStockSnapshot);
         setInterval(refreshLiveData, 15000);
 
         benchmarkSelect?.addEventListener('change', () => {
             refreshStrategistDesk(currentStockSnapshot);
+        });
+
+        document.querySelectorAll('[data-quick-period]').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetPeriod = button.getAttribute('data-quick-period');
+                const radio = document.querySelector(`input[name="period"][value="${targetPeriod}"]`);
+                if (!radio) return;
+                radio.checked = true;
+                currentPeriod = targetPeriod;
+                syncQuickIntervals();
+                refreshLiveData();
+            });
         });
 
         document.querySelectorAll('input[name="period"]').forEach(radio => {
