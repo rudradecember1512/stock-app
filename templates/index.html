@@ -1408,6 +1408,160 @@
             background: var(--success);
         }
 
+        .desk-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .desk-card {
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at top right, rgba(38, 198, 160, 0.12), transparent 30%),
+                linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(10, 20, 28, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+        }
+
+        .desk-card::before {
+            content: "";
+            position: absolute;
+            inset: auto -40px -56px auto;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .desk-head {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .desk-kicker {
+            color: var(--accent-soft);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .desk-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .desk-badge {
+            padding: 9px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .desk-note {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.65;
+            margin-bottom: 16px;
+        }
+
+        .plan-grid,
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .plan-item,
+        .structure-item {
+            padding: 13px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .plan-label,
+        .structure-label {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .plan-value,
+        .structure-value {
+            color: white;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .desk-select {
+            min-width: 168px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(7, 17, 25, 0.7);
+            color: var(--text);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .desk-divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            margin: 16px 0;
+        }
+
+        .desk-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .desk-mini-card {
+            padding: 12px 13px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .desk-mini-card strong {
+            display: block;
+            color: white;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+
+        .desk-mini-card span {
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
         .chart-toolbar {
             display: flex;
             justify-content: space-between;
@@ -1856,7 +2010,8 @@
             .market-overview,
             .brief-grid,
             .tool-row,
-            .pro-grid {
+            .pro-grid,
+            .desk-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1922,7 +2077,10 @@
             .brief-points,
             .range-values,
             .insight-row,
-            .indicator-grid {
+            .indicator-grid,
+            .plan-grid,
+            .structure-grid,
+            .desk-mini-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1985,7 +2143,7 @@
                     <a class="topbar-link" href="/terms">Terms</a>
                     <a class="topbar-link" href="/contact">Contact</a>
                 </div>
-                <div class="topbar-badge">1S LIVE REFRESH</div>
+                <div class="topbar-badge">15S LIVE REFRESH</div>
             </div>
         </div>
 
@@ -2371,6 +2529,102 @@
                     <div class="signal-reason" id="signalReason">{{ data.signal_reason }}</div>
                 </div>
 
+                <div class="desk-grid">
+                    <div class="desk-card">
+                        <div class="desk-head">
+                            <div>
+                                <div class="desk-kicker">Trade Plan</div>
+                                <div class="desk-title">Execution Map</div>
+                            </div>
+                            <div class="desk-badge" id="planBiasBadge">{{ data.signal }}</div>
+                        </div>
+                        <div class="desk-note" id="planSummaryText">Levels, ATR, and current structure are combined into a working execution map.</div>
+                        <div class="plan-grid">
+                            <div class="plan-item">
+                                <span class="plan-label">Entry Zone</span>
+                                <div class="plan-value" id="planEntryValue">Calculating...</div>
+                            </div>
+                            <div class="plan-item">
+                                <span class="plan-label">Protective Stop</span>
+                                <div class="plan-value" id="planStopValue">Calculating...</div>
+                            </div>
+                            <div class="plan-item">
+                                <span class="plan-label">Upside Trigger</span>
+                                <div class="plan-value" id="planUpsideValue">Calculating...</div>
+                            </div>
+                            <div class="plan-item">
+                                <span class="plan-label">Breakdown Path</span>
+                                <div class="plan-value" id="planBreakdownValue">Calculating...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desk-card">
+                        <div class="desk-head">
+                            <div>
+                                <div class="desk-kicker">Relative Strength</div>
+                                <div class="desk-title">Benchmark Compare</div>
+                            </div>
+                            <select class="desk-select" id="benchmarkSelect"></select>
+                        </div>
+                        <div class="desk-note" id="benchmarkSummaryText">Compare this setup against a live benchmark to see whether the stock is leading or lagging.</div>
+                        <div class="desk-mini-grid">
+                            <div class="desk-mini-card">
+                                <span>Benchmark</span>
+                                <strong id="benchmarkNameValue">Nifty 50</strong>
+                            </div>
+                            <div class="desk-mini-card">
+                                <span>Benchmark Move</span>
+                                <strong id="benchmarkDeltaValue">--</strong>
+                            </div>
+                            <div class="desk-mini-card">
+                                <span>Relative Edge</span>
+                                <strong id="benchmarkAlphaValue">--</strong>
+                            </div>
+                        </div>
+                        <div class="desk-divider"></div>
+                        <div class="plan-grid">
+                            <div class="plan-item">
+                                <span class="plan-label">Benchmark Trend</span>
+                                <div class="plan-value" id="benchmarkTrendValue">Unavailable</div>
+                            </div>
+                            <div class="plan-item">
+                                <span class="plan-label">Benchmark Price</span>
+                                <div class="plan-value" id="benchmarkPriceValue">N/A</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desk-card">
+                        <div class="desk-head">
+                            <div>
+                                <div class="desk-kicker">Session Structure</div>
+                                <div class="desk-title">Desk Readout</div>
+                            </div>
+                            <div class="desk-badge" id="structureBiasBadge">{{ data.setup_label }}</div>
+                        </div>
+                        <div class="desk-note" id="structureSummaryText">A concise readout of trend, momentum, range location, and active timeframe.</div>
+                        <div class="structure-grid">
+                            <div class="structure-item">
+                                <span class="structure-label">Trend Stack</span>
+                                <div class="structure-value" id="structureTrendValue">Loading...</div>
+                            </div>
+                            <div class="structure-item">
+                                <span class="structure-label">Momentum</span>
+                                <div class="structure-value" id="structureMomentumValue">Loading...</div>
+                            </div>
+                            <div class="structure-item">
+                                <span class="structure-label">Range Context</span>
+                                <div class="structure-value" id="structureRangeValue">Loading...</div>
+                            </div>
+                            <div class="structure-item">
+                                <span class="structure-label">Active Timeframe</span>
+                                <div class="structure-value" id="structureTimeframeValue">{{ data.display_period }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pro-grid">
                     <div class="indicator-grid">
                         <div class="indicator-card">
@@ -2640,6 +2894,7 @@
         const pinCurrentBtn = document.getElementById('pinCurrentBtn');
         const copySummaryBtn = document.getElementById('copySummaryBtn');
         const copySnapshotBtn = document.getElementById('copySnapshotBtn');
+        const benchmarkSelect = document.getElementById('benchmarkSelect');
 
         const RECENT_SEARCHES_KEY = 'stock-app-recent-searches';
         const FAVORITE_SEARCHES_KEY = 'stock-app-favorite-searches';
@@ -2652,6 +2907,39 @@
 
         function normalizeSymbol(value) {
             return String(value || '').trim().toUpperCase();
+        }
+
+        function toNumeric(value) {
+            if (value === null || value === undefined || value === '' || value === 'N/A') return NaN;
+            const parsed = parseFloat(value);
+            return Number.isFinite(parsed) ? parsed : NaN;
+        }
+
+        function formatSignedPercent(value) {
+            const num = toNumeric(value);
+            if (Number.isNaN(num)) return 'N/A';
+            return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
+        }
+
+        function getSelectedBenchmarkSymbol() {
+            return benchmarkSelect?.value || '^NSEI';
+        }
+
+        function getBenchmarkItem() {
+            const selected = getSelectedBenchmarkSymbol();
+            return (Array.isArray(marketIndicesData) ? marketIndicesData : []).find(item => item.symbol === selected) || null;
+        }
+
+        function populateBenchmarkSelect() {
+            if (!benchmarkSelect) return;
+            const selected = benchmarkSelect.value || '^NSEI';
+            const options = (Array.isArray(marketIndicesData) ? marketIndicesData : []).map(item =>
+                `<option value="${item.symbol}">${item.name}</option>`
+            ).join('');
+            benchmarkSelect.innerHTML = options;
+            if ([...benchmarkSelect.options].some(option => option.value === selected)) {
+                benchmarkSelect.value = selected;
+            }
         }
 
         function buildSparklinePoints(values) {
@@ -2701,6 +2989,8 @@
                     symbolInput.focus();
                 });
             });
+
+            populateBenchmarkSelect();
         }
 
         function updateMarketPulse(items) {
@@ -2760,6 +3050,7 @@
                 marketIndicesData = result.indices || [];
                 renderMarketIndices(marketIndicesData);
                 updateMarketPulse(marketIndicesData);
+                window.refreshStrategistDesk?.();
                 refreshCountdown = 15;
             } catch (error) {
                 console.log('Market indices refresh error:', error);
@@ -3070,6 +3361,24 @@
         let supportLevels = {{ support_levels | tojson }};
         let resistanceLevels = {{ resistance_levels | tojson }};
         let checklistItems = {{ data.checklist_items | tojson }};
+        let currentStockSnapshot = {
+            symbol: {{ data.symbol | tojson }},
+            price: {{ data.price | tojson }},
+            percent: {{ data.percent | tojson }},
+            currency: {{ data.currency | tojson }},
+            signal: {{ data.signal | tojson }},
+            setup_label: {{ data.setup_label | tojson }},
+            display_period: {{ data.display_period | tojson }},
+            ema20: {{ data.ema20 | tojson }},
+            ema50: {{ data.ema50 | tojson }},
+            atr: {{ data.atr | tojson }},
+            rsi: {{ data.rsi | tojson }},
+            stoch_k: {{ data.stoch_k | tojson }},
+            stoch_d: {{ data.stoch_d | tojson }},
+            macd_status: {{ data.macd_status | tojson }},
+            support_levels: {{ data.support_levels | tojson }},
+            resistance_levels: {{ data.resistance_levels | tojson }}
+        };
 
         let priceChartInstance = null;
         let volumeChartInstance = null;
@@ -3099,6 +3408,156 @@
         function formatPercentOrNA(value) {
             return value === "N/A" || value === null || value === undefined ? "N/A" : `${value}%`;
         }
+
+        function formatPlanCurrency(value, currency) {
+            const num = toNumeric(value);
+            if (Number.isNaN(num)) return 'N/A';
+            const prefix = currency === 'INR' ? 'Rs ' : '$';
+            return `${prefix}${num.toFixed(2)}`;
+        }
+
+        function updateTradePlan(stock) {
+            const entryEl = document.getElementById('planEntryValue');
+            const stopEl = document.getElementById('planStopValue');
+            const upsideEl = document.getElementById('planUpsideValue');
+            const breakdownEl = document.getElementById('planBreakdownValue');
+            const summaryEl = document.getElementById('planSummaryText');
+            const biasBadge = document.getElementById('planBiasBadge');
+
+            if (!entryEl || !stopEl || !upsideEl || !breakdownEl || !summaryEl || !biasBadge) return;
+
+            const price = toNumeric(stock.price);
+            const atr = toNumeric(stock.atr);
+            const s1 = toNumeric((stock.support_levels || [])[0]);
+            const s2 = toNumeric((stock.support_levels || [])[1]);
+            const r1 = toNumeric((stock.resistance_levels || [])[0]);
+            const r2 = toNumeric((stock.resistance_levels || [])[1]);
+            const ema20 = toNumeric(stock.ema20);
+            const ema50 = toNumeric(stock.ema50);
+            const bullishStack = !Number.isNaN(ema20) && !Number.isNaN(ema50) && ema20 >= ema50;
+            const priceBuffer = !Number.isNaN(atr) ? atr * 0.35 : 0;
+
+            const entryLow = !Number.isNaN(s1) ? Math.max(s1, price - priceBuffer) : price - priceBuffer;
+            const entryHigh = !Number.isNaN(price) ? price : entryLow;
+            const stopBase = !Number.isNaN(s1) ? s1 : (!Number.isNaN(price) && !Number.isNaN(atr) ? price - atr : NaN);
+            const stopValue = !Number.isNaN(stopBase) && !Number.isNaN(atr) ? stopBase - (atr * 0.2) : stopBase;
+            const upsideLabel = !Number.isNaN(r1)
+                ? `${formatPlanCurrency(r1, stock.currency)} then ${!Number.isNaN(r2) ? formatPlanCurrency(r2, stock.currency) : 'trail by ATR'}`
+                : (!Number.isNaN(price) && !Number.isNaN(atr) ? `${formatPlanCurrency(price + atr, stock.currency)} initial extension` : 'N/A');
+            const breakdownLabel = !Number.isNaN(s1)
+                ? `Below ${formatPlanCurrency(s1, stock.currency)} opens ${!Number.isNaN(s2) ? formatPlanCurrency(s2, stock.currency) : 'lower support'}`
+                : 'Waiting for structure to form';
+
+            entryEl.textContent = !Number.isNaN(entryLow) && !Number.isNaN(entryHigh)
+                ? `${formatPlanCurrency(entryLow, stock.currency)} to ${formatPlanCurrency(entryHigh, stock.currency)}`
+                : 'N/A';
+            stopEl.textContent = formatPlanCurrency(stopValue, stock.currency);
+            upsideEl.textContent = upsideLabel;
+            breakdownEl.textContent = breakdownLabel;
+            biasBadge.textContent = stock.signal || 'Neutral';
+            summaryEl.textContent = bullishStack
+                ? 'Trend structure still favors pullback entries while resistance levels define the upside ladder.'
+                : 'Structure is not fully supportive, so confirmation above resistance matters more than early entry.';
+        }
+
+        function updateRelativeStrength(stock) {
+            const nameEl = document.getElementById('benchmarkNameValue');
+            const deltaEl = document.getElementById('benchmarkDeltaValue');
+            const alphaEl = document.getElementById('benchmarkAlphaValue');
+            const trendEl = document.getElementById('benchmarkTrendValue');
+            const priceEl = document.getElementById('benchmarkPriceValue');
+            const summaryEl = document.getElementById('benchmarkSummaryText');
+            if (!nameEl || !deltaEl || !alphaEl || !trendEl || !priceEl || !summaryEl) return;
+
+            const benchmark = getBenchmarkItem();
+            const stockPercent = toNumeric(stock.percent);
+
+            if (!benchmark) {
+                nameEl.textContent = 'Unavailable';
+                deltaEl.textContent = 'N/A';
+                alphaEl.textContent = 'N/A';
+                trendEl.textContent = 'Unavailable';
+                priceEl.textContent = 'N/A';
+                summaryEl.textContent = 'Benchmark data is not available right now.';
+                return;
+            }
+
+            const benchmarkPercent = toNumeric(benchmark.percent);
+            const relativeEdge = !Number.isNaN(stockPercent) && !Number.isNaN(benchmarkPercent)
+                ? stockPercent - benchmarkPercent
+                : NaN;
+
+            nameEl.textContent = benchmark.name || benchmark.symbol || 'Benchmark';
+            deltaEl.textContent = formatSignedPercent(benchmarkPercent);
+            alphaEl.textContent = Number.isNaN(relativeEdge)
+                ? 'N/A'
+                : `${relativeEdge >= 0 ? '+' : ''}${relativeEdge.toFixed(2)} pts`;
+            trendEl.textContent = benchmark.trend || 'Unavailable';
+            priceEl.textContent = benchmark.price ?? 'N/A';
+            summaryEl.textContent = Number.isNaN(relativeEdge)
+                ? 'Relative strength is unavailable until both moves are known.'
+                : relativeEdge >= 0
+                    ? `The stock is outperforming ${benchmark.name} by ${relativeEdge.toFixed(2)} percentage points.`
+                    : `The stock is lagging ${benchmark.name} by ${Math.abs(relativeEdge).toFixed(2)} percentage points.`;
+        }
+
+        function updateStructureDesk(stock) {
+            const trendEl = document.getElementById('structureTrendValue');
+            const momentumEl = document.getElementById('structureMomentumValue');
+            const rangeEl = document.getElementById('structureRangeValue');
+            const timeframeEl = document.getElementById('structureTimeframeValue');
+            const summaryEl = document.getElementById('structureSummaryText');
+            const biasBadge = document.getElementById('structureBiasBadge');
+            if (!trendEl || !momentumEl || !rangeEl || !timeframeEl || !summaryEl || !biasBadge) return;
+
+            const price = toNumeric(stock.price);
+            const ema20 = toNumeric(stock.ema20);
+            const ema50 = toNumeric(stock.ema50);
+            const rsi = toNumeric(stock.rsi);
+            const stochK = toNumeric(stock.stoch_k);
+            const s1 = toNumeric((stock.support_levels || [])[0]);
+            const r1 = toNumeric((stock.resistance_levels || [])[0]);
+
+            let trendState = 'Neutral Stack';
+            if (!Number.isNaN(price) && !Number.isNaN(ema20) && !Number.isNaN(ema50)) {
+                if (price >= ema20 && ema20 >= ema50) trendState = 'Bullish Stack';
+                else if (price <= ema20 && ema20 <= ema50) trendState = 'Bearish Stack';
+                else trendState = 'Transition';
+            }
+
+            let momentumState = 'Balanced';
+            if (!Number.isNaN(rsi)) {
+                if (rsi >= 70 || stochK >= 80) momentumState = 'Extended';
+                else if (rsi <= 35 || (!Number.isNaN(stochK) && stochK <= 20)) momentumState = 'Washout Zone';
+                else if ((stock.macd_status || '').includes('Bullish')) momentumState = 'Momentum Building';
+                else if ((stock.macd_status || '').includes('Bearish')) momentumState = 'Momentum Fading';
+            }
+
+            let rangeState = 'Mid Range';
+            if (!Number.isNaN(price) && !Number.isNaN(s1) && !Number.isNaN(r1) && r1 !== s1) {
+                const distanceFromSupport = Math.abs(price - s1);
+                const distanceFromResistance = Math.abs(r1 - price);
+                const spread = Math.abs(r1 - s1);
+                if (distanceFromSupport <= spread * 0.22) rangeState = 'Near Support';
+                else if (distanceFromResistance <= spread * 0.22) rangeState = 'Near Resistance';
+            }
+
+            trendEl.textContent = trendState;
+            momentumEl.textContent = momentumState;
+            rangeEl.textContent = rangeState;
+            timeframeEl.textContent = stock.display_period || currentPeriod.toUpperCase();
+            biasBadge.textContent = stock.setup_label || 'Balanced';
+            summaryEl.textContent = `${trendState} with ${momentumState.toLowerCase()} conditions on the ${stock.display_period || currentPeriod.toUpperCase()} chart.`;
+        }
+
+        function refreshStrategistDesk(stock = currentStockSnapshot) {
+            if (!stock) return;
+            updateTradePlan(stock);
+            updateRelativeStrength(stock);
+            updateStructureDesk(stock);
+        }
+
+        window.refreshStrategistDesk = refreshStrategistDesk;
 
         function updateBriefInsights(stock) {
             const scoreFill = document.getElementById('setupScoreFill');
@@ -3652,6 +4111,12 @@
                 supportLevels = result.support_levels || [];
                 resistanceLevels = result.resistance_levels || [];
                 checklistItems = stock.checklist_items || [];
+                currentStockSnapshot = {
+                    ...stock,
+                    display_period: result.display_period || stock.display_period || currentPeriod.toUpperCase(),
+                    support_levels: supportLevels,
+                    resistance_levels: resistanceLevels
+                };
 
                 document.getElementById('stockName').textContent = stock.name || 'N/A';
                 document.getElementById('stockSymbol').textContent = stock.symbol || 'N/A';
@@ -3711,6 +4176,7 @@
                 document.getElementById('periodTitleVolume').textContent = displayPeriod;
                 document.getElementById('periodTitleStoch').textContent = displayPeriod;
                 document.getElementById('modeBadge').textContent = result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE';
+                refreshStrategistDesk(currentStockSnapshot);
 
                 const resolvedTextEl = document.getElementById('resolvedText');
                 if (stock.resolved_from && stock.resolved_from.toUpperCase() !== stock.symbol) {
@@ -3763,7 +4229,13 @@
         });
         renderChecklist(checklistItems);
         initCharts();
+        populateBenchmarkSelect();
+        refreshStrategistDesk(currentStockSnapshot);
         setInterval(refreshLiveData, 15000);
+
+        benchmarkSelect?.addEventListener('change', () => {
+            refreshStrategistDesk(currentStockSnapshot);
+        });
 
         document.querySelectorAll('input[name="period"]').forEach(radio => {
             radio.addEventListener('change', () => {
