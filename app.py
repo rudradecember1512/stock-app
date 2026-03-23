@@ -312,14 +312,16 @@ def clean_company_name(name):
 
 def get_history_config(selected_period):
     period_map = {
-        "1d": {"period": "1d", "interval": "5m", "is_intraday": True},
-        "5d": {"period": "5d", "interval": "15m", "is_intraday": True},
-        "1mo": {"period": "1mo", "interval": "1d", "is_intraday": False},
-        "3mo": {"period": "3mo", "interval": "1d", "is_intraday": False},
-        "6mo": {"period": "6mo", "interval": "1d", "is_intraday": False},
-        "1y": {"period": "1y", "interval": "1d", "is_intraday": False},
+        "1min": {"period": "7d", "interval": "1m", "is_intraday": True, "label": "1MIN"},
+        "5min": {"period": "30d", "interval": "5m", "is_intraday": True, "label": "5MIN"},
+        "15min": {"period": "60d", "interval": "15m", "is_intraday": True, "label": "15MIN"},
+        "1h": {"period": "60d", "interval": "60m", "is_intraday": True, "label": "1H"},
+        "1d": {"period": "1y", "interval": "1d", "is_intraday": False, "label": "1D"},
+        "5d": {"period": "5d", "interval": "1d", "is_intraday": False, "label": "5D"},
+        "1mo": {"period": "1mo", "interval": "1d", "is_intraday": False, "label": "1MO"},
+        "6mo": {"period": "6mo", "interval": "1d", "is_intraday": False, "label": "6MO"},
     }
-    return period_map.get(selected_period, period_map["6mo"])
+    return period_map.get(selected_period, period_map["1d"])
 
 
 def format_market_cap(market_cap):
@@ -346,12 +348,14 @@ def format_volume(volume):
     return "N/A"
 
 
-def make_chart_labels(index_values, is_intraday):
+def make_chart_labels(index_values, is_intraday, interval=None):
     labels = []
 
     for dt in index_values:
         try:
-            if is_intraday:
+            if is_intraday and interval in {"1m", "5m", "15m", "60m"}:
+                labels.append(dt.strftime("%d %b %H:%M"))
+            elif is_intraday:
                 labels.append(dt.strftime("%H:%M"))
             else:
                 labels.append(dt.strftime("%Y-%m-%d"))
@@ -385,8 +389,8 @@ def dedupe_price_levels(levels, tolerance_ratio=0.015):
     return deduped
 
 
-def calculate_support_resistance(hist):
-    if hist.empty or len(hist) < 20:
+def calculate_support_resistance(hist, current_price=None):
+    if hist.empty or len(hist) < 5:
         return [], []
 
     highs = hist["High"].reset_index(drop=True)
@@ -395,39 +399,57 @@ def calculate_support_resistance(hist):
     raw_supports = []
     raw_resistances = []
 
-    for i in range(2, len(hist) - 2):
-        current_low = safe_float(lows.iloc[i], None)
-        current_high = safe_float(highs.iloc[i], None)
+    if len(hist) < 20:
+        raw_supports = [round(safe_float(value), 2) for value in lows.tolist() if safe_float(value, None) is not None]
+        raw_resistances = [round(safe_float(value), 2) for value in highs.tolist() if safe_float(value, None) is not None]
+    else:
+        for i in range(2, len(hist) - 2):
+            current_low = safe_float(lows.iloc[i], None)
+            current_high = safe_float(highs.iloc[i], None)
 
-        if current_low is not None:
-            if (
-                current_low <= safe_float(lows.iloc[i - 1], current_low)
-                and current_low <= safe_float(lows.iloc[i - 2], current_low)
-                and current_low <= safe_float(lows.iloc[i + 1], current_low)
-                and current_low <= safe_float(lows.iloc[i + 2], current_low)
-            ):
-                raw_supports.append(round(current_low, 2))
+            if current_low is not None:
+                if (
+                    current_low <= safe_float(lows.iloc[i - 1], current_low)
+                    and current_low <= safe_float(lows.iloc[i - 2], current_low)
+                    and current_low <= safe_float(lows.iloc[i + 1], current_low)
+                    and current_low <= safe_float(lows.iloc[i + 2], current_low)
+                ):
+                    raw_supports.append(round(current_low, 2))
 
-        if current_high is not None:
-            if (
-                current_high >= safe_float(highs.iloc[i - 1], current_high)
-                and current_high >= safe_float(highs.iloc[i - 2], current_high)
-                and current_high >= safe_float(highs.iloc[i + 1], current_high)
-                and current_high >= safe_float(highs.iloc[i + 2], current_high)
-            ):
-                raw_resistances.append(round(current_high, 2))
+            if current_high is not None:
+                if (
+                    current_high >= safe_float(highs.iloc[i - 1], current_high)
+                    and current_high >= safe_float(highs.iloc[i - 2], current_high)
+                    and current_high >= safe_float(highs.iloc[i + 1], current_high)
+                    and current_high >= safe_float(highs.iloc[i + 2], current_high)
+                ):
+                    raw_resistances.append(round(current_high, 2))
 
     support_levels = dedupe_price_levels(raw_supports)
     resistance_levels = dedupe_price_levels(raw_resistances)
 
-    if not hist.empty:
+    if current_price is None and not hist.empty:
         current_price = safe_float(hist["Close"].iloc[-1], 0)
 
+    if current_price is not None:
         supports_below = [x for x in support_levels if x <= current_price]
         resistances_above = [x for x in resistance_levels if x >= current_price]
 
-        support_levels = supports_below[-2:] if supports_below else support_levels[:2]
-        resistance_levels = resistances_above[:2] if resistances_above else resistance_levels[-2:]
+        if len(supports_below) >= 2:
+            support_levels = supports_below[-2:]
+        elif len(supports_below) == 1:
+            fallback_support = [x for x in support_levels if x < supports_below[0]]
+            support_levels = fallback_support[-1:] + supports_below
+        else:
+            support_levels = support_levels[:2]
+
+        if len(resistances_above) >= 2:
+            resistance_levels = resistances_above[:2]
+        elif len(resistances_above) == 1:
+            fallback_resistance = [x for x in resistance_levels if x > resistances_above[0]]
+            resistance_levels = resistances_above + fallback_resistance[:1]
+        else:
+            resistance_levels = resistance_levels[-2:]
 
     support_levels = sorted(support_levels)
     resistance_levels = sorted(resistance_levels)
@@ -1016,7 +1038,7 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     if not hist_main.empty:
         hist_main = hist_main.copy()
 
-        chart_labels = make_chart_labels(hist_main.index, config["is_intraday"])
+        chart_labels = make_chart_labels(hist_main.index, config["is_intraday"], config["interval"])
         chart_prices = [round(safe_float(price), 2) for price in hist_main["Close"].tolist()]
         volume_values = [int(safe_float(v, 0)) for v in hist_main["Volume"].tolist()]
 
@@ -1122,8 +1144,8 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
             else:
                 macd_status = "Neutral"
 
-        recent_hist = hist_6mo.tail(90)
-        support_levels, resistance_levels = calculate_support_resistance(recent_hist)
+        level_hist = hist_main.copy() if len(hist_main) >= 20 else hist_6mo.tail(120).copy()
+        support_levels, resistance_levels = calculate_support_resistance(level_hist, current_price=current_price)
 
     market_cap = safe_get_market_cap(info, fast_info)
     pe_ratio = safe_get_pe_ratio(info)
@@ -1240,7 +1262,8 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "checklist_passed": checklist_passed,
         "support_levels": support_levels,
         "resistance_levels": resistance_levels,
-        "resolved_from": original_input if original_input else symbol
+        "resolved_from": original_input if original_input else symbol,
+        "display_period": config["label"]
     }
 
     ai_summary = generate_ai_summary(data, news, selected_period)
@@ -1267,6 +1290,7 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "support_levels": support_levels,
         "resistance_levels": resistance_levels,
         "selected_period": selected_period,
+        "display_period": config["label"],
         "is_intraday": config["is_intraday"]
     }
 
@@ -1301,12 +1325,12 @@ def index():
     news = []
     ai_summary = None
     error_message = None
-    selected_period = "6mo"
+    selected_period = "1d"
     is_intraday = False
 
     if request.method == "POST":
         user_input = request.form.get("symbol", "").strip()
-        selected_period = request.form.get("period", "6mo")
+        selected_period = request.form.get("period", "1d")
 
         if not user_input:
             error_message = "Please enter a stock name or symbol."
@@ -1384,7 +1408,7 @@ def contact():
 
 @app.route("/live-data/<symbol>")
 def live_data(symbol):
-    selected_period = request.args.get("period", "6mo")
+    selected_period = request.args.get("period", "1d")
 
     try:
         result = build_stock_payload(symbol, selected_period, original_input=symbol)

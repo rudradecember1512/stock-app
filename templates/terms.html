@@ -114,6 +114,45 @@
             margin-bottom: 20px;
         }
 
+        .center-header {
+            position: relative;
+            padding: 30px 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .center-header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 184, 77, 0.16), transparent 24%),
+                radial-gradient(circle at 85% 30%, rgba(38, 198, 160, 0.14), transparent 24%);
+            pointer-events: none;
+        }
+
+        .center-header h2 {
+            position: relative;
+            z-index: 1;
+            font-family: "Space Grotesk", Arial, sans-serif;
+            font-size: 42px;
+            line-height: 1.02;
+            letter-spacing: -0.05em;
+            max-width: 720px;
+            margin: 0 auto 12px;
+        }
+
+        .center-header p {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
         .eyebrow {
             display: inline-block;
             color: #ffdca2;
@@ -205,6 +244,11 @@
                 <a href="/privacy">Privacy</a>
                 <a href="/contact">Contact</a>
             </div>
+        </div>
+
+        <div class="panel center-header">
+            <h2>Terms should feel like part of the experience, not a detached text page bolted onto the app.</h2>
+            <p>This centered header gives the page a stronger presence and keeps the legal sections aligned with the main brand language.</p>
         </div>
 
         <div class="hero panel">
