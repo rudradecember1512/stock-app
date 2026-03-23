@@ -2037,8 +2037,8 @@
             </div>
             <div class="status-card">
                 <div class="status-label">Refresh Cycle</div>
-                <div class="status-value" id="refreshCountdownValue">1s</div>
-                <div class="status-note">Indices and stock panels refresh continuously.</div>
+                <div class="status-value" id="refreshCountdownValue">15s</div>
+                <div class="status-note">Indices and stock panels refresh every 15 seconds.</div>
             </div>
         </div>
 
@@ -2648,7 +2648,7 @@
         let activeSuggestionIndex = -1;
         let suggestionDebounce = null;
         let marketIndicesData = {{ market_indices | tojson }};
-        let refreshCountdown = 1;
+        let refreshCountdown = 15;
 
         function normalizeSymbol(value) {
             return String(value || '').trim().toUpperCase();
@@ -2760,7 +2760,7 @@
                 marketIndicesData = result.indices || [];
                 renderMarketIndices(marketIndicesData);
                 updateMarketPulse(marketIndicesData);
-                refreshCountdown = 1;
+                refreshCountdown = 15;
             } catch (error) {
                 console.log('Market indices refresh error:', error);
             }
@@ -2845,7 +2845,7 @@
         renderMarketIndices(marketIndicesData);
         updateMarketPulse(marketIndicesData);
         updateClocks();
-        setInterval(refreshMarketIndices, 1000);
+        setInterval(refreshMarketIndices, 15000);
         setInterval(() => {
             refreshCountdown = Math.max(0, refreshCountdown - 1);
             updateClocks();
@@ -3763,7 +3763,7 @@
         });
         renderChecklist(checklistItems);
         initCharts();
-        setInterval(refreshLiveData, 1000);
+        setInterval(refreshLiveData, 15000);
 
         document.querySelectorAll('input[name="period"]').forEach(radio => {
             radio.addEventListener('change', () => {
