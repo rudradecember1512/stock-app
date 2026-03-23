@@ -637,6 +637,64 @@ def build_trade_checklist(price, ema20, ema50, rsi, macd_status, stoch_k, stoch_
     return checklist, passed
 
 
+def build_risk_profile(current_price, atr, beta, volume_vs_avg, support_levels):
+    score = 45
+    reasons = []
+
+    if isinstance(beta, (int, float)):
+        if beta >= 1.5:
+            score += 18
+            reasons.append("beta is elevated")
+        elif beta <= 0.85:
+            score -= 8
+            reasons.append("beta is relatively defensive")
+        else:
+            reasons.append("beta is in a moderate range")
+
+    if isinstance(current_price, (int, float)) and current_price > 0 and isinstance(atr, (int, float)):
+        atr_pct = (atr / current_price) * 100
+        if atr_pct >= 4:
+            score += 22
+            reasons.append("ATR implies wide price swings")
+        elif atr_pct >= 2:
+            score += 10
+            reasons.append("ATR shows moderate movement")
+        else:
+            score -= 6
+            reasons.append("ATR is relatively contained")
+
+    if isinstance(volume_vs_avg, (int, float)):
+        if volume_vs_avg >= 160:
+            score += 10
+            reasons.append("volume is running hot versus average")
+        elif volume_vs_avg <= 70:
+            score -= 4
+            reasons.append("volume participation is lighter than average")
+
+    if isinstance(current_price, (int, float)) and support_levels:
+        nearest_support = next((lvl for lvl in support_levels if isinstance(lvl, (int, float))), None)
+        if isinstance(nearest_support, (int, float)) and current_price > 0:
+            distance_pct = abs(current_price - nearest_support) / current_price * 100
+            if distance_pct <= 1.2:
+                score += 8
+                reasons.append("price is sitting close to support, so a break could matter quickly")
+
+    score = max(0, min(100, round(score)))
+
+    if score >= 72:
+        label = "High Risk"
+    elif score >= 52:
+        label = "Moderate Risk"
+    else:
+        label = "Controlled Risk"
+
+    reason = ". ".join(reasons[:3]).capitalize() if reasons else "Risk profile is based on volatility, beta, and participation."
+    if reason and not reason.endswith("."):
+        reason += "."
+
+    return score, label, reason
+
+
 def get_market_indices_snapshot():
     indices = []
 
@@ -1202,6 +1260,14 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         elif beta <= 0.85:
             risk_level = "Defensive"
 
+    risk_score, risk_score_label, risk_reason = build_risk_profile(
+        round(current_price, 2),
+        latest_atr,
+        beta,
+        volume_vs_avg if isinstance(volume_vs_avg, (int, float)) else None,
+        support_levels
+    )
+
     setup_score, setup_label, news_sentiment = build_trade_setup({
         "rsi": latest_rsi,
         "price": round(current_price, 2),
@@ -1252,6 +1318,9 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "volume_trend": volume_trend,
         "beta": beta,
         "risk_level": risk_level,
+        "risk_score": risk_score,
+        "risk_score_label": risk_score_label,
+        "risk_reason": risk_reason,
         "week_52_low": week_low,
         "week_52_high": week_high,
         "price_position_52w": price_position_52w,

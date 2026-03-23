@@ -1228,6 +1228,200 @@
             letter-spacing: 0.6px;
         }
 
+        .feature-ribbon {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .feature-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(10, 20, 28, 0.78));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+        }
+
+        .feature-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .feature-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            line-height: 1.15;
+        }
+
+        .feature-note {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .portfolio-panel {
+            padding: 22px;
+            border-radius: 22px;
+            margin-bottom: 18px;
+            background:
+                radial-gradient(circle at top right, rgba(255, 184, 77, 0.1), transparent 28%),
+                linear-gradient(145deg, rgba(8, 24, 34, 0.92), rgba(13, 21, 30, 0.92));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+        }
+
+        .portfolio-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .portfolio-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .portfolio-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 700px;
+        }
+
+        .portfolio-form {
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr 0.9fr auto;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .portfolio-field input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .portfolio-action {
+            border: none;
+            border-radius: 14px;
+            padding: 13px 18px;
+            background: linear-gradient(135deg, #49e2b4, #26c6a0);
+            color: #04212b;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+        }
+
+        .portfolio-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .portfolio-stat {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .portfolio-stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .portfolio-stat strong {
+            display: block;
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .portfolio-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .portfolio-empty {
+            padding: 16px;
+            border-radius: 16px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .portfolio-row {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .portfolio-symbol {
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .portfolio-name {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .portfolio-metric-label {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 5px;
+        }
+
+        .portfolio-metric-value {
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .portfolio-remove {
+            border: 1px solid rgba(255, 107, 107, 0.22);
+            background: rgba(255, 107, 107, 0.08);
+            color: #fecaca;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
         .brief-grid {
             display: grid;
             grid-template-columns: 1.1fr 0.9fr;
@@ -2011,12 +2205,19 @@
             .brief-grid,
             .tool-row,
             .pro-grid,
-            .desk-grid {
+            .desk-grid,
+            .feature-ribbon,
+            .portfolio-summary {
                 grid-template-columns: 1fr;
             }
 
             .indicator-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+
+            .portfolio-form,
+            .portfolio-row {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -2080,7 +2281,9 @@
             .indicator-grid,
             .plan-grid,
             .structure-grid,
-            .desk-mini-grid {
+            .desk-mini-grid,
+            .feature-ribbon,
+            .portfolio-summary {
                 grid-template-columns: 1fr;
             }
 
@@ -2445,6 +2648,52 @@
                 <div class="action-row">
                     <button type="button" class="ghost-button" id="copySummaryBtn">Copy Summary</button>
                     <button type="button" class="ghost-button" id="copySnapshotBtn">Copy Snapshot</button>
+                </div>
+
+                <div class="feature-ribbon">
+                    <div class="feature-card">
+                        <div class="feature-label">Buy / Sell Signal</div>
+                        <div class="feature-value" id="signalFeatureValue">{{ data.signal }}</div>
+                        <div class="feature-note" id="signalFeatureNote">{{ data.signal_reason }}</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-label">Risk Score</div>
+                        <div class="feature-value" id="riskScoreValue">{{ data.risk_score }}/100</div>
+                        <div class="feature-note" id="riskScoreNote">{{ data.risk_score_label }}. {{ data.risk_reason }}</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-label">AI Explanation</div>
+                        <div class="feature-value" id="aiReasonValue">Why this stock?</div>
+                        <div class="feature-note" id="aiReasonNote">{{ ai_summary if ai_summary else 'Technical and news context will appear here after analysis.' }}</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-label">News Sentiment</div>
+                        <div class="feature-value" id="newsFeatureValue">{{ data.news_sentiment }}</div>
+                        <div class="feature-note" id="newsFeatureNote">Headline flow is being used as a sentiment overlay on the technical setup.</div>
+                    </div>
+                </div>
+
+                <div class="portfolio-panel">
+                    <div class="portfolio-head">
+                        <div>
+                            <div class="portfolio-title">Portfolio Tracking</div>
+                            <div class="portfolio-subtitle">Save the current stock as a position, track invested value, mark-to-market value, and live profit or loss locally in your browser.</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-form">
+                        <div class="portfolio-field">
+                            <input type="text" id="portfolioSymbolInput" value="{{ data.symbol }}" readonly>
+                        </div>
+                        <div class="portfolio-field">
+                            <input type="number" id="portfolioSharesInput" min="0" step="0.01" placeholder="Shares / Qty">
+                        </div>
+                        <div class="portfolio-field">
+                            <input type="number" id="portfolioCostInput" min="0" step="0.01" placeholder="Average Cost">
+                        </div>
+                        <button type="button" class="portfolio-action" id="addPortfolioBtn">Add Position</button>
+                    </div>
+                    <div class="portfolio-summary" id="portfolioSummary"></div>
+                    <div class="portfolio-list" id="portfolioList"></div>
                 </div>
 
                 <div class="brief-grid">
@@ -2895,9 +3144,16 @@
         const copySummaryBtn = document.getElementById('copySummaryBtn');
         const copySnapshotBtn = document.getElementById('copySnapshotBtn');
         const benchmarkSelect = document.getElementById('benchmarkSelect');
+        const portfolioListEl = document.getElementById('portfolioList');
+        const portfolioSummaryEl = document.getElementById('portfolioSummary');
+        const portfolioSymbolInput = document.getElementById('portfolioSymbolInput');
+        const portfolioSharesInput = document.getElementById('portfolioSharesInput');
+        const portfolioCostInput = document.getElementById('portfolioCostInput');
+        const addPortfolioBtn = document.getElementById('addPortfolioBtn');
 
         const RECENT_SEARCHES_KEY = 'stock-app-recent-searches';
         const FAVORITE_SEARCHES_KEY = 'stock-app-favorite-searches';
+        const PORTFOLIO_KEY = 'stock-app-portfolio';
 
         let currentSuggestions = [];
         let activeSuggestionIndex = -1;
@@ -3070,6 +3326,122 @@
             localStorage.setItem(key, JSON.stringify(list));
         }
 
+        function readPortfolio() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(PORTFOLIO_KEY) || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writePortfolio(list) {
+            localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(list));
+        }
+
+        function formatPortfolioMoney(value, currency) {
+            const num = toNumeric(value);
+            if (Number.isNaN(num)) return 'N/A';
+            return `${currency === 'INR' ? 'Rs ' : '$'}${num.toFixed(2)}`;
+        }
+
+        function summarizePortfolioByCurrency(list) {
+            const buckets = {};
+            list.forEach(item => {
+                const currency = item.currency || 'USD';
+                const invested = toNumeric(item.shares) * toNumeric(item.avgCost);
+                const current = toNumeric(item.shares) * toNumeric(item.lastPrice);
+                if (!buckets[currency]) {
+                    buckets[currency] = { invested: 0, current: 0, positions: 0 };
+                }
+                buckets[currency].invested += Number.isNaN(invested) ? 0 : invested;
+                buckets[currency].current += Number.isNaN(current) ? 0 : current;
+                buckets[currency].positions += 1;
+            });
+            return buckets;
+        }
+
+        function renderPortfolio() {
+            if (!portfolioListEl || !portfolioSummaryEl) return;
+            const portfolio = readPortfolio();
+
+            if (!portfolio.length) {
+                portfolioSummaryEl.innerHTML = `
+                    <div class="portfolio-stat"><span>Positions</span><strong>0</strong></div>
+                    <div class="portfolio-stat"><span>Invested</span><strong>N/A</strong></div>
+                    <div class="portfolio-stat"><span>Current Value</span><strong>N/A</strong></div>
+                    <div class="portfolio-stat"><span>P/L</span><strong>N/A</strong></div>
+                `;
+                portfolioListEl.innerHTML = '<div class="portfolio-empty">No positions saved yet. Search a stock, enter quantity and average cost, then add it to your portfolio tracker.</div>';
+                return;
+            }
+
+            const buckets = summarizePortfolioByCurrency(portfolio);
+            portfolioSummaryEl.innerHTML = Object.entries(buckets).map(([currency, stats]) => {
+                const pnl = stats.current - stats.invested;
+                return `
+                    <div class="portfolio-stat"><span>${currency} Positions</span><strong>${stats.positions}</strong></div>
+                    <div class="portfolio-stat"><span>${currency} Invested</span><strong>${formatPortfolioMoney(stats.invested, currency)}</strong></div>
+                    <div class="portfolio-stat"><span>${currency} Current</span><strong>${formatPortfolioMoney(stats.current, currency)}</strong></div>
+                    <div class="portfolio-stat"><span>${currency} P/L</span><strong class="${pnl >= 0 ? 'positive' : 'negative'}">${formatPortfolioMoney(pnl, currency)}</strong></div>
+                `;
+            }).join('');
+
+            portfolioListEl.innerHTML = portfolio.map(item => {
+                const invested = toNumeric(item.shares) * toNumeric(item.avgCost);
+                const current = toNumeric(item.shares) * toNumeric(item.lastPrice);
+                const pnl = current - invested;
+                return `
+                    <div class="portfolio-row">
+                        <div>
+                            <div class="portfolio-symbol">${item.symbol}</div>
+                            <div class="portfolio-name">${item.name || item.symbol}</div>
+                        </div>
+                        <div>
+                            <div class="portfolio-metric-label">Quantity</div>
+                            <div class="portfolio-metric-value">${item.shares}</div>
+                        </div>
+                        <div>
+                            <div class="portfolio-metric-label">Average Cost</div>
+                            <div class="portfolio-metric-value">${formatPortfolioMoney(item.avgCost, item.currency)}</div>
+                        </div>
+                        <div>
+                            <div class="portfolio-metric-label">P/L</div>
+                            <div class="portfolio-metric-value ${pnl >= 0 ? 'positive' : 'negative'}">${formatPortfolioMoney(pnl, item.currency)}</div>
+                        </div>
+                        <button type="button" class="portfolio-remove" data-remove-symbol="${item.symbol}">Remove</button>
+                    </div>
+                `;
+            }).join('');
+
+            portfolioListEl.querySelectorAll('[data-remove-symbol]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const symbol = button.getAttribute('data-remove-symbol');
+                    writePortfolio(readPortfolio().filter(item => item.symbol !== symbol));
+                    renderPortfolio();
+                });
+            });
+        }
+
+        function syncPortfolioPrice(stock) {
+            if (!stock || !stock.symbol) return;
+            let changed = false;
+            const next = readPortfolio().map(item => {
+                if (item.symbol !== stock.symbol) return item;
+                changed = true;
+                return {
+                    ...item,
+                    name: stock.name || item.name,
+                    currency: stock.currency || item.currency,
+                    lastPrice: stock.price ?? item.lastPrice
+                };
+            });
+            if (changed) {
+                writePortfolio(next);
+                renderPortfolio();
+            }
+        }
+
         function renderSavedList(container, list, removable = false) {
             if (!container) return;
 
@@ -3133,6 +3505,7 @@
         }
 
         refreshStoredLists();
+        renderPortfolio();
         renderMarketIndices(marketIndicesData);
         updateMarketPulse(marketIndicesData);
         updateClocks();
@@ -3336,6 +3709,46 @@
                 setTimeout(() => { copySnapshotBtn.textContent = 'Copy Snapshot'; }, 1200);
             });
         }
+
+        if (addPortfolioBtn) {
+            addPortfolioBtn.addEventListener('click', () => {
+                const symbol = normalizeSymbol(portfolioSymbolInput?.value || window.currentSymbol || '');
+                const shares = toNumeric(portfolioSharesInput?.value);
+                const avgCost = toNumeric(portfolioCostInput?.value);
+                if (!symbol || Number.isNaN(shares) || shares <= 0 || Number.isNaN(avgCost) || avgCost <= 0) {
+                    return;
+                }
+
+                const portfolio = readPortfolio();
+                const existing = portfolio.find(item => item.symbol === symbol);
+                const stockName = document.getElementById('stockName')?.textContent || symbol;
+                const priceText = document.getElementById('priceValue')?.textContent || '';
+                const parsedLastPrice = toNumeric(priceText.replace('Rs', '').replace('$', '').trim());
+                const currency = priceText.includes('Rs') ? 'INR' : 'USD';
+
+                if (existing) {
+                    existing.shares = shares;
+                    existing.avgCost = avgCost;
+                    existing.lastPrice = Number.isNaN(parsedLastPrice) ? existing.lastPrice : parsedLastPrice;
+                    existing.currency = existing.currency || currency;
+                    existing.name = stockName;
+                } else {
+                    portfolio.push({
+                        symbol,
+                        name: stockName,
+                        shares,
+                        avgCost,
+                        lastPrice: Number.isNaN(parsedLastPrice) ? avgCost : parsedLastPrice,
+                        currency
+                    });
+                }
+
+                writePortfolio(portfolio);
+                renderPortfolio();
+                portfolioSharesInput.value = '';
+                portfolioCostInput.value = '';
+            });
+        }
     </script>
 
     {% if data %}
@@ -3363,10 +3776,12 @@
         let checklistItems = {{ data.checklist_items | tojson }};
         let currentStockSnapshot = {
             symbol: {{ data.symbol | tojson }},
+            name: {{ data.name | tojson }},
             price: {{ data.price | tojson }},
             percent: {{ data.percent | tojson }},
             currency: {{ data.currency | tojson }},
             signal: {{ data.signal | tojson }},
+            signal_reason: {{ data.signal_reason | tojson }},
             setup_label: {{ data.setup_label | tojson }},
             display_period: {{ data.display_period | tojson }},
             ema20: {{ data.ema20 | tojson }},
@@ -3376,6 +3791,10 @@
             stoch_k: {{ data.stoch_k | tojson }},
             stoch_d: {{ data.stoch_d | tojson }},
             macd_status: {{ data.macd_status | tojson }},
+            risk_score: {{ data.risk_score | tojson }},
+            risk_score_label: {{ data.risk_score_label | tojson }},
+            risk_reason: {{ data.risk_reason | tojson }},
+            news_sentiment: {{ data.news_sentiment | tojson }},
             support_levels: {{ data.support_levels | tojson }},
             resistance_levels: {{ data.resistance_levels | tojson }}
         };
@@ -3573,6 +3992,12 @@
             const volumeTrendValue = document.getElementById('volumeTrendValue');
             const betaValue = document.getElementById('betaValue');
             const pricePositionValue = document.getElementById('pricePositionValue');
+            const signalFeatureValue = document.getElementById('signalFeatureValue');
+            const signalFeatureNote = document.getElementById('signalFeatureNote');
+            const riskScoreValue = document.getElementById('riskScoreValue');
+            const riskScoreNote = document.getElementById('riskScoreNote');
+            const newsFeatureValue = document.getElementById('newsFeatureValue');
+            const aiReasonNote = document.getElementById('aiReasonNote');
 
             if (scoreFill) scoreFill.style.width = `${stock.setup_score || 0}%`;
             if (scoreValue) scoreValue.innerHTML = `${stock.setup_score || 0}<span>/100</span>`;
@@ -3586,6 +4011,12 @@
             if (rangeMarker) rangeMarker.style.left = `${stock.price_position_52w === 'N/A' ? 50 : stock.price_position_52w}%`;
             if (volumeTrendValue) volumeTrendValue.textContent = stock.volume_trend || 'Normal';
             if (betaValue) betaValue.textContent = stock.beta === 'N/A' ? 'N/A' : `Beta ${stock.beta}`;
+            if (signalFeatureValue) signalFeatureValue.textContent = stock.signal || 'Neutral';
+            if (signalFeatureNote) signalFeatureNote.textContent = stock.signal_reason || 'Indicators are mixed.';
+            if (riskScoreValue) riskScoreValue.textContent = `${stock.risk_score ?? 0}/100`;
+            if (riskScoreNote) riskScoreNote.textContent = `${stock.risk_score_label || 'Moderate Risk'}. ${stock.risk_reason || ''}`.trim();
+            if (newsFeatureValue) newsFeatureValue.textContent = stock.news_sentiment || 'Mixed';
+            if (aiReasonNote && stock.ai_summary) aiReasonNote.textContent = stock.ai_summary;
             if (pricePositionValue) {
                 pricePositionValue.textContent = stock.price_position_52w === 'N/A'
                     ? '52-week position is not available.'
@@ -3614,6 +4045,7 @@
             if (stochValue) stochValue.textContent = `${stock.stoch_k || 'N/A'}/${stock.stoch_d || 'N/A'}`;
             if (participationValue) participationValue.textContent = stock.volume_trend || 'Normal';
             if (regimeValue) regimeValue.textContent = stock.setup_label || 'Balanced';
+            if (portfolioSymbolInput) portfolioSymbolInput.value = stock.symbol || '';
         }
 
         function renderChecklist(items) {
@@ -4141,6 +4573,7 @@
 
                 if (aiSummaryEl && result.ai_summary) {
                     aiSummaryEl.textContent = result.ai_summary;
+                    currentStockSnapshot.ai_summary = result.ai_summary;
                     aiSummaryBox.style.display = 'block';
                 } else if (aiSummaryBox) {
                     aiSummaryBox.style.display = 'none';
@@ -4177,6 +4610,7 @@
                 document.getElementById('periodTitleStoch').textContent = displayPeriod;
                 document.getElementById('modeBadge').textContent = result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE';
                 refreshStrategistDesk(currentStockSnapshot);
+                syncPortfolioPrice(currentStockSnapshot);
 
                 const resolvedTextEl = document.getElementById('resolvedText');
                 if (stock.resolved_from && stock.resolved_from.toUpperCase() !== stock.symbol) {
@@ -4210,7 +4644,12 @@
             setup_score: {{ data.setup_score | tojson }},
             setup_label: {{ data.setup_label | tojson }},
             risk_level: {{ data.risk_level | tojson }},
+            risk_score: {{ data.risk_score | tojson }},
+            risk_score_label: {{ data.risk_score_label | tojson }},
+            risk_reason: {{ data.risk_reason | tojson }},
             news_sentiment: {{ data.news_sentiment | tojson }},
+            signal: {{ data.signal | tojson }},
+            signal_reason: {{ data.signal_reason | tojson }},
             avg_volume: {{ data.avg_volume | tojson }},
             volume_vs_avg: {{ data.volume_vs_avg | tojson }},
             week_52_low: {{ data.week_52_low | tojson }},
@@ -4225,12 +4664,15 @@
             bb_lower: {{ data.bb_lower | tojson }},
             atr: {{ data.atr | tojson }},
             stoch_k: {{ data.stoch_k | tojson }},
-            stoch_d: {{ data.stoch_d | tojson }}
+            stoch_d: {{ data.stoch_d | tojson }},
+            ai_summary: {{ ai_summary | tojson }},
+            symbol: {{ data.symbol | tojson }}
         });
         renderChecklist(checklistItems);
         initCharts();
         populateBenchmarkSelect();
         refreshStrategistDesk(currentStockSnapshot);
+        syncPortfolioPrice(currentStockSnapshot);
         setInterval(refreshLiveData, 15000);
 
         benchmarkSelect?.addEventListener('change', () => {
