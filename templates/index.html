@@ -188,6 +188,44 @@
             border-color: rgba(38, 198, 160, 0.28);
         }
 
+        .status-ribbon {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .status-card {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: rgba(6, 19, 26, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+        }
+
+        .status-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .status-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            font-family: "Space Grotesk", Arial, sans-serif;
+        }
+
+        .status-note {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
         .hero {
             background:
                 linear-gradient(135deg, rgba(255, 184, 77, 0.07), transparent 35%),
@@ -429,6 +467,131 @@
             border-radius: var(--radius-xl);
             padding: 24px;
             box-shadow: var(--shadow);
+        }
+
+        .market-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .market-title-note {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .market-command-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .command-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .command-chip:hover {
+            background: rgba(38, 198, 160, 0.12);
+            border-color: rgba(38, 198, 160, 0.24);
+        }
+
+        .market-overview {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .index-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.22s ease;
+        }
+
+        .index-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(73, 226, 180, 0.2);
+        }
+
+        .index-card::after {
+            content: "";
+            position: absolute;
+            right: -30px;
+            bottom: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(73, 226, 180, 0.08);
+            pointer-events: none;
+        }
+
+        .index-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .index-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .index-symbol {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .index-trend {
+            padding: 8px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .index-price {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            font-family: "Space Grotesk", Arial, sans-serif;
+        }
+
+        .index-change {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .sparkline {
+            width: 100%;
+            height: 54px;
         }
 
         .section-title {
@@ -1359,6 +1522,8 @@
 
             .hero-metrics,
             .market-strip,
+            .status-ribbon,
+            .market-overview,
             .brief-grid,
             .tool-row,
             .pro-grid {
@@ -1462,7 +1627,30 @@
                     <a class="topbar-link" href="/terms">Terms</a>
                     <a class="topbar-link" href="/contact">Contact</a>
                 </div>
-                <div class="topbar-badge">REAL-TIME REFRESH</div>
+                <div class="topbar-badge">1S LIVE REFRESH</div>
+            </div>
+        </div>
+
+        <div class="status-ribbon">
+            <div class="status-card">
+                <div class="status-label">Market Pulse</div>
+                <div class="status-value" id="marketPulseValue">Balanced</div>
+                <div class="status-note" id="marketPulseNote">Tracking benchmark breadth across Indian indices.</div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">India Time</div>
+                <div class="status-value" id="indiaClockValue">--:--:--</div>
+                <div class="status-note">Asia/Kolkata live clock</div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">UTC Time</div>
+                <div class="status-value" id="utcClockValue">--:--:--</div>
+                <div class="status-note">Universal market reference</div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">Refresh Cycle</div>
+                <div class="status-value" id="refreshCountdownValue">1s</div>
+                <div class="status-note">Indices and stock panels refresh continuously.</div>
             </div>
         </div>
 
@@ -1535,6 +1723,54 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="market-title-row">
+                <div class="section-title" style="margin-bottom:0;">Live Market Indices</div>
+                <div class="market-title-note">Nifty, Sensex, banking, midcap and sector benchmarks in one board.</div>
+            </div>
+            <div class="market-command-row">
+                <div class="command-chip" data-market-symbol="^NSEI">Open Nifty 50</div>
+                <div class="command-chip" data-market-symbol="^BSESN">Open Sensex</div>
+                <div class="command-chip" data-market-symbol="^NSEBANK">Open Bank Nifty</div>
+                <div class="command-chip" data-market-symbol="^NSEMDCP50">Open Midcap</div>
+                <div class="command-chip" data-market-symbol="^BSEBANK">Open Bankex</div>
+            </div>
+            <div class="market-overview" id="marketIndicesGrid">
+                {% for item in market_indices %}
+                <div class="index-card">
+                    <div class="index-head">
+                        <div>
+                            <div class="index-name">{{ item.name }}</div>
+                            <div class="index-symbol">{{ item.symbol }}</div>
+                        </div>
+                        <div class="index-trend">{{ item.trend }}</div>
+                    </div>
+                    <div class="index-price">{{ item.price }}</div>
+                    <div class="index-change {% if item.change != 'N/A' and item.change >= 0 %}positive{% elif item.change != 'N/A' and item.change < 0 %}negative{% else %}neutral{% endif %}">
+                        {% if item.change == 'N/A' %}N/A{% else %}{{ item.change }} ({{ item.percent }}%){% endif %}
+                    </div>
+                    <svg class="sparkline" viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline
+                            fill="none"
+                            stroke="{% if item.change != 'N/A' and item.change >= 0 %}#49e2b4{% else %}#ff6b6b{% endif %}"
+                            stroke-width="3"
+                            points="
+                            {% if item.sparkline %}
+                                {% set ns = namespace(points=[]) %}
+                                {% for value in item.sparkline %}
+                                    {% set x = (loop.index0 * (120 / ((item.sparkline|length - 1) if item.sparkline|length > 1 else 1))) %}
+                                    {% set y = 36 - (((value - (item.sparkline|min)) / (((item.sparkline|max) - (item.sparkline|min)) if (item.sparkline|max) != (item.sparkline|min) else 1)) * 28) %}
+                                    {% set ns.points = ns.points + ['%0.2f,%0.2f'|format(x, y)] %}
+                                {% endfor %}
+                                {{ ns.points|join(' ') }}
+                            {% endif %}
+                            " />
+                    </svg>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -1997,6 +2233,12 @@
         const searchBtn = document.getElementById('searchBtn');
         const symbolInput = document.getElementById('symbolInput');
         const suggestionsBox = document.getElementById('suggestionsBox');
+        const marketIndicesGrid = document.getElementById('marketIndicesGrid');
+        const marketPulseValue = document.getElementById('marketPulseValue');
+        const marketPulseNote = document.getElementById('marketPulseNote');
+        const indiaClockValue = document.getElementById('indiaClockValue');
+        const utcClockValue = document.getElementById('utcClockValue');
+        const refreshCountdownValue = document.getElementById('refreshCountdownValue');
         const recentSearchesEl = document.getElementById('recentSearches');
         const favoriteSearchesEl = document.getElementById('favoriteSearches');
         const pinCurrentBtn = document.getElementById('pinCurrentBtn');
@@ -2009,9 +2251,123 @@
         let currentSuggestions = [];
         let activeSuggestionIndex = -1;
         let suggestionDebounce = null;
+        let marketIndicesData = {{ market_indices | tojson }};
+        let refreshCountdown = 1;
 
         function normalizeSymbol(value) {
             return String(value || '').trim().toUpperCase();
+        }
+
+        function buildSparklinePoints(values) {
+            if (!Array.isArray(values) || !values.length) return '';
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const range = max - min || 1;
+            return values.map((value, index) => {
+                const x = (index * 120) / Math.max(values.length - 1, 1);
+                const y = 36 - (((value - min) / range) * 28);
+                return `${x.toFixed(2)},${y.toFixed(2)}`;
+            }).join(' ');
+        }
+
+        function renderMarketIndices(items) {
+            if (!marketIndicesGrid) return;
+            const list = Array.isArray(items) ? items : [];
+
+            marketIndicesGrid.innerHTML = list.map(item => `
+                <div class="index-card" data-index-symbol="${item.symbol || ''}">
+                    <div class="index-head">
+                        <div>
+                            <div class="index-name">${item.name || 'Index'}</div>
+                            <div class="index-symbol">${item.symbol || ''}</div>
+                        </div>
+                        <div class="index-trend">${item.trend || 'Unavailable'}</div>
+                    </div>
+                    <div class="index-price">${item.price ?? 'N/A'}</div>
+                    <div class="index-change ${parseFloat(item.change) > 0 ? 'positive' : parseFloat(item.change) < 0 ? 'negative' : 'neutral'}">
+                        ${item.change === 'N/A' ? 'N/A' : `${item.change} (${item.percent}%)`}
+                    </div>
+                    <svg class="sparkline" viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline
+                            fill="none"
+                            stroke="${parseFloat(item.change) >= 0 ? '#49e2b4' : '#ff6b6b'}"
+                            stroke-width="3"
+                            points="${buildSparklinePoints(item.sparkline || [])}" />
+                    </svg>
+                </div>
+            `).join('');
+
+            marketIndicesGrid.querySelectorAll('[data-index-symbol]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const symbol = card.getAttribute('data-index-symbol');
+                    if (!symbol || !symbolInput) return;
+                    symbolInput.value = symbol;
+                    symbolInput.focus();
+                });
+            });
+        }
+
+        function updateMarketPulse(items) {
+            if (!marketPulseValue || !marketPulseNote) return;
+            const list = Array.isArray(items) ? items.filter(item => typeof item.percent === 'number') : [];
+
+            if (!list.length) {
+                marketPulseValue.textContent = 'Unavailable';
+                marketPulseNote.textContent = 'Index breadth is not available right now.';
+                return;
+            }
+
+            const positiveCount = list.filter(item => item.percent >= 0).length;
+            const sorted = [...list].sort((a, b) => b.percent - a.percent);
+            const leader = sorted[0];
+            const laggard = sorted[sorted.length - 1];
+
+            if (positiveCount >= Math.ceil(list.length * 0.7)) {
+                marketPulseValue.textContent = 'Risk-On';
+            } else if (positiveCount <= Math.floor(list.length * 0.3)) {
+                marketPulseValue.textContent = 'Risk-Off';
+            } else {
+                marketPulseValue.textContent = 'Mixed';
+            }
+
+            marketPulseNote.textContent = `${positiveCount}/${list.length} indices positive. Leader: ${leader.name} ${leader.percent}%. Laggard: ${laggard.name} ${laggard.percent}%.`;
+        }
+
+        function updateClocks() {
+            const now = new Date();
+            if (indiaClockValue) {
+                indiaClockValue.textContent = now.toLocaleTimeString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+            if (utcClockValue) {
+                utcClockValue.textContent = now.toLocaleTimeString('en-GB', {
+                    timeZone: 'UTC',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+            if (refreshCountdownValue) {
+                refreshCountdownValue.textContent = `${refreshCountdown}s`;
+            }
+        }
+
+        async function refreshMarketIndices() {
+            try {
+                const response = await fetch('/market-indices');
+                const result = await response.json();
+                if (!result.success) return;
+                marketIndicesData = result.indices || [];
+                renderMarketIndices(marketIndicesData);
+                updateMarketPulse(marketIndicesData);
+                refreshCountdown = 1;
+            } catch (error) {
+                console.log('Market indices refresh error:', error);
+            }
         }
 
         function readStoredList(key) {
@@ -2090,6 +2446,23 @@
         }
 
         refreshStoredLists();
+        renderMarketIndices(marketIndicesData);
+        updateMarketPulse(marketIndicesData);
+        updateClocks();
+        setInterval(refreshMarketIndices, 1000);
+        setInterval(() => {
+            refreshCountdown = Math.max(0, refreshCountdown - 1);
+            updateClocks();
+        }, 1000);
+
+        document.querySelectorAll('[data-market-symbol]').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const symbol = chip.getAttribute('data-market-symbol');
+                if (!symbol || !symbolInput) return;
+                symbolInput.value = symbol;
+                symbolInput.focus();
+            });
+        });
 
         function hideSuggestions() {
             suggestionsBox.innerHTML = '';
@@ -2320,11 +2693,6 @@
             if (text.includes('Buy') || text.includes('Bullish') || text.includes('Reversal')) return 'positive';
             if (text.includes('Sell') || text.includes('Bearish') || text.includes('Caution')) return 'negative';
             return 'neutral';
-        }
-
-        function formatCurrency(value, currency) {
-            if (value === "N/A" || value === null || value === undefined) return "N/A";
-            return currency === "INR" ? `₹${value}` : `$${value}`;
         }
 
         function formatCurrency(value, currency) {
@@ -2998,7 +3366,7 @@
         });
         renderChecklist(checklistItems);
         initCharts();
-        setInterval(refreshLiveData, 15000);
+        setInterval(refreshLiveData, 1000);
 
         document.querySelectorAll('input[name="period"]').forEach(radio => {
             radio.addEventListener('change', () => {
@@ -3027,9 +3395,3 @@
     {% endif %}
 </body>
 </html>
-<footer style="text-align:center; margin-top:50px; padding:20px; background:#111; color:#aaa;">
-    <p>© 2026 Stock Analyzer</p>
-    <a href="/privacy" style="color:#aaa;">Privacy Policy</a> |
-    <a href="/terms" style="color:#aaa;">Terms</a> |
-    <a href="/contact" style="color:#aaa;">Contact</a>
-</footer>

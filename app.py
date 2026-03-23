@@ -145,6 +145,15 @@ STOCK_ALIASES = {
     "STARBUCKS": "SBUX"
 }
 
+INDEX_SYMBOLS = {
+    "Nifty 50": "^NSEI",
+    "Sensex": "^BSESN",
+    "Bank Nifty": "^NSEBANK",
+    "Nifty Midcap 50": "^NSEMDCP50",
+    "Bankex": "^BSEBANK",
+    "Nifty IT": "^CNXIT"
+}
+
 
 def normalize_user_input(user_input):
     return " ".join(str(user_input).strip().upper().split())
@@ -604,6 +613,55 @@ def build_trade_checklist(price, ema20, ema50, rsi, macd_status, stoch_k, stoch_
 
     passed = sum(1 for item in checklist if item["status"])
     return checklist, passed
+
+
+def get_market_indices_snapshot():
+    indices = []
+
+    for name, symbol in INDEX_SYMBOLS.items():
+        try:
+            ticker = yf.Ticker(symbol)
+            hist = ticker.history(period="5d", interval="1d")
+
+            if hist.empty:
+                indices.append({
+                    "name": name,
+                    "symbol": symbol,
+                    "price": "N/A",
+                    "change": "N/A",
+                    "percent": "N/A",
+                    "trend": "Unavailable",
+                    "sparkline": []
+                })
+                continue
+
+            close_values = hist["Close"].dropna().tolist()
+            latest_price = safe_float(close_values[-1], 0)
+            previous_price = safe_float(close_values[-2], latest_price) if len(close_values) >= 2 else latest_price
+            change = latest_price - previous_price
+            percent = (change / previous_price * 100) if previous_price else 0
+
+            indices.append({
+                "name": name,
+                "symbol": symbol,
+                "price": round(latest_price, 2),
+                "change": round(change, 2),
+                "percent": round(percent, 2),
+                "trend": "Bullish" if change >= 0 else "Bearish",
+                "sparkline": [round(safe_float(value), 2) for value in close_values[-5:]]
+            })
+        except Exception:
+            indices.append({
+                "name": name,
+                "symbol": symbol,
+                "price": "N/A",
+                "change": "N/A",
+                "percent": "N/A",
+                "trend": "Unavailable",
+                "sparkline": []
+            })
+
+    return indices
 
 
 def detect_currency(symbol, info, fast_info):
@@ -1223,6 +1281,7 @@ def suggest():
 @app.route("/", methods=["GET", "POST"])
 def index():
     data = None
+    market_indices = get_market_indices_snapshot()
     chart_labels = []
     chart_prices = []
     candle_data = []
@@ -1288,6 +1347,7 @@ def index():
     return render_template(
         "index.html",
         data=data,
+        market_indices=market_indices,
         chart_labels=chart_labels,
         chart_prices=chart_prices,
         candle_data=candle_data,
@@ -1334,6 +1394,21 @@ def live_data(symbol):
         return jsonify({
             "success": False,
             "error_message": "Something went wrong while fetching live data."
+        })
+
+
+@app.route("/market-indices")
+def market_indices():
+    try:
+        return jsonify({
+            "success": True,
+            "indices": get_market_indices_snapshot()
+        })
+    except Exception as e:
+        print("Market indices error:", e)
+        return jsonify({
+            "success": False,
+            "indices": []
         })
 
 
