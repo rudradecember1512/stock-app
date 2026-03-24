@@ -370,6 +370,114 @@ STRATEGY_LIBRARY = [
             {"label": "Short Put", "value": 28, "color": "#f6c15c"},
             {"label": "Max Profit Cap", "value": 78, "color": "#ff6f7d"}
         ]
+    },
+    {
+        "slug": "trend-following",
+        "name": "Trend Following Strategy",
+        "category": "Option Buying",
+        "market_type": "Strong Trend",
+        "strike_rate": "63%",
+        "summary": "Trade only in the direction of the dominant trend after pullbacks, consolidations, or continuation breakouts.",
+        "timeframe": "15 min, 1 hour, or daily trend continuation setups",
+        "strike_selection": "Buy ATM or 1-step ITM call in bullish trends and ATM or 1-step ITM put in bearish trends. Avoid far OTM contracts when chasing trends.",
+        "entry": "Enter after trend continuation confirms through pullback rejection, breakout above recent high, or reclaim of key moving average support.",
+        "stop_loss": "Place SL below the continuation candle low in bullish setups or above the continuation candle high in bearish setups.",
+        "targets": "Use measured move, previous swing extension, or trail using EMA or swing lows and highs.",
+        "chart_focus": "The setup works best when the market is making higher highs and higher lows or lower highs and lower lows without choppy overlap.",
+        "steps": [
+            "Start with higher timeframe trend confirmation.",
+            "Wait for pullback or tight consolidation instead of buying random expansion.",
+            "Use options with enough time value if the trend is expected to continue over multiple candles.",
+            "Trail profit instead of exiting too early in strong trend phases."
+        ],
+        "chart_type": "trend",
+        "chart_points": [20, 24, 28, 34, 42, 40, 48, 58, 68],
+        "levels": [
+            {"label": "Trend Support", "value": 40, "color": "#63efc1"},
+            {"label": "Entry", "value": 48, "color": "#f6c15c"},
+            {"label": "SL", "value": 36, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "pinocchio",
+        "name": "Pinocchio Strategy",
+        "category": "Option Buying",
+        "market_type": "Reversal / Trap",
+        "strike_rate": "55%",
+        "summary": "Use a long rejection wick candle, often called the Pin Bar or Pinocchio Bar, to trade false breakouts and trapped participants.",
+        "timeframe": "5 min, 15 min, 1 hour, or daily at key levels",
+        "strike_selection": "Buy ATM call after bullish pin bar rejection from support. Buy ATM put after bearish pin bar rejection from resistance.",
+        "entry": "Enter only when the next candle breaks the nose of the pin bar in the reversal direction.",
+        "stop_loss": "Place SL beyond the tail of the pin bar because the tail marks the invalidation point.",
+        "targets": "First target is the midpoint of the range, then prior swing high or low or next structure zone.",
+        "chart_focus": "Look for a candle with a long wick rejecting a major level, showing failed breakout or failed breakdown behavior.",
+        "steps": [
+            "Use the pattern only near important support, resistance, VWAP, or moving average zones.",
+            "Do not trade random pin bars in the middle of chop.",
+            "Volume confirmation improves quality significantly.",
+            "If the next candle fails to confirm quickly, skip the setup."
+        ],
+        "chart_type": "reversal",
+        "chart_points": [46, 52, 60, 76, 82, 58, 44, 36, 30],
+        "levels": [
+            {"label": "Rejection Zone", "value": 78, "color": "#63efc1"},
+            {"label": "Entry", "value": 56, "color": "#f6c15c"},
+            {"label": "SL", "value": 84, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "straddle",
+        "name": "Straddle Strategy",
+        "category": "Option Selling",
+        "market_type": "High Volatility Event / Neutral View",
+        "strike_rate": "49%",
+        "summary": "A straddle involves trading call and put options at the same strike to express either volatility expectation or premium-selling neutrality.",
+        "timeframe": "Event day, expiry week, or short-term premium strategy",
+        "strike_selection": "For a long straddle, buy both ATM call and ATM put. For a short straddle, sell both ATM call and ATM put only with strict risk control.",
+        "entry": "Long straddle is taken before a large expected move. Short straddle is taken only when implied volatility is rich and range expectation is strong.",
+        "stop_loss": "Long straddle uses premium decay control and event timing. Short straddle needs a strict spot-based SL or premium-based SL on either leg.",
+        "targets": "Long straddle targets a sharp post-event expansion. Short straddle targets theta decay and IV crush while price stays near the strike.",
+        "chart_focus": "The underlying may stay compressed before the event and then expand sharply. Short straddle works best when price remains pinned near the strike.",
+        "steps": [
+            "Be clear whether you are using the buying or selling version of the strategy.",
+            "Event risk matters more here than standard chart structure.",
+            "Short straddles need disciplined hedging and defined risk rules.",
+            "Avoid oversized positions because volatility can reprice fast."
+        ],
+        "chart_type": "payoff",
+        "chart_points": [76, 58, 40, 28, 20, 28, 40, 58, 76],
+        "levels": [
+            {"label": "ATM Strike", "value": 20, "color": "#63efc1"},
+            {"label": "Breakeven Zone", "value": 40, "color": "#f6c15c"},
+            {"label": "High Risk Beyond", "value": 72, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "risk-reversal",
+        "name": "Risk Reversal Strategy",
+        "category": "Option Selling",
+        "market_type": "Directional Hedge",
+        "strike_rate": "56%",
+        "summary": "Risk reversal combines selling one side of the market and buying the other to create a directional options position with lower premium outflow.",
+        "timeframe": "Swing directional setup or hedge structure",
+        "strike_selection": "Bullish risk reversal usually sells OTM put and buys OTM call. Bearish risk reversal usually sells OTM call and buys OTM put.",
+        "entry": "Use only when you already have a directional bias and strong support or resistance defines the level you are willing to defend.",
+        "stop_loss": "Exit if the market starts threatening the short option side or if the spot invalidates the directional thesis.",
+        "targets": "Target expansion toward the bought option side while monitoring the risk created by the sold leg.",
+        "chart_focus": "The chart should support a directional bias with a well-defined invalidation level because one option leg is uncovered by default.",
+        "steps": [
+            "Use only if you understand the risk of the short side clearly.",
+            "Best when skew or premium structure makes the setup efficient.",
+            "Needs strong conviction and disciplined adjustment rules.",
+            "Not ideal for uncertain, range-bound conditions."
+        ],
+        "chart_type": "payoff",
+        "chart_points": [64, 60, 56, 48, 38, 28, 22, 18, 16],
+        "levels": [
+            {"label": "Bought Option Side", "value": 28, "color": "#63efc1"},
+            {"label": "Short Option Risk", "value": 56, "color": "#ff6f7d"},
+            {"label": "Entry Bias Zone", "value": 38, "color": "#f6c15c"}
+        ]
     }
 ]
 
