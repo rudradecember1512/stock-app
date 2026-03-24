@@ -154,6 +154,225 @@ INDEX_SYMBOLS = {
     "Nifty IT": "^CNXIT"
 }
 
+STRATEGY_LIBRARY = [
+    {
+        "slug": "ema-crossover",
+        "name": "EMA Crossover Strategy",
+        "category": "Option Buying",
+        "market_type": "Trending",
+        "strike_rate": "61%",
+        "summary": "Use a fast EMA crossing above or below a slower EMA to participate in fresh directional momentum.",
+        "timeframe": "5 min or 15 min for intraday, 1 hour for swing setups",
+        "strike_selection": "Buy ATM or 1-step ITM call when fast EMA crosses above slow EMA. Buy ATM or 1-step ITM put when fast EMA crosses below slow EMA.",
+        "entry": "Enter only after candle close confirms the crossover and price is holding above or below both EMAs.",
+        "stop_loss": "Place SL below the crossover candle low for calls or above the crossover candle high for puts. Exit if the fast EMA flips back.",
+        "targets": "Book partial near the previous swing high or low, then trail with the fast EMA.",
+        "chart_focus": "The chart should show the fast EMA rising through the slow EMA with price expanding in the same direction.",
+        "steps": [
+            "Wait for crossover plus candle-close confirmation.",
+            "Check that volume is above recent average.",
+            "Use ATM or slightly ITM options to reduce theta pressure.",
+            "Trail once price creates a fresh swing in your favor."
+        ],
+        "chart_type": "trend",
+        "chart_points": [72, 69, 67, 62, 54, 46, 38, 26, 18],
+        "levels": [
+            {"label": "Entry", "value": 45, "color": "#63efc1"},
+            {"label": "SL", "value": 58, "color": "#ff6f7d"},
+            {"label": "Target", "value": 24, "color": "#f6c15c"}
+        ]
+    },
+    {
+        "slug": "ema-89",
+        "name": "89 EMA Trend Pullback",
+        "category": "Option Buying",
+        "market_type": "Strong Trend",
+        "strike_rate": "64%",
+        "summary": "Use the 89 EMA as a trend filter and buy only when price pulls back into it and then resumes the dominant move.",
+        "timeframe": "15 min or 1 hour",
+        "strike_selection": "In an uptrend, buy ATM call or 1-step ITM call when price respects the 89 EMA. In a downtrend, buy ATM or ITM put on rejection from the 89 EMA.",
+        "entry": "Entry comes after rejection from the 89 EMA and break of the pullback candle high or low.",
+        "stop_loss": "Keep SL just below the 89 EMA support bounce or above the rejection candle in downtrends.",
+        "targets": "Use previous trend impulse highs or lows and trail once the move extends 1R.",
+        "chart_focus": "The chart should show price trending away from the 89 EMA, pulling back into it, then resuming with a rejection candle.",
+        "steps": [
+            "Trade only in the direction of the 89 EMA slope.",
+            "Avoid entries if price is chopping around the EMA.",
+            "Wait for rejection plus fresh momentum candle.",
+            "If the 89 EMA is flat, skip the setup."
+        ],
+        "chart_type": "trend",
+        "chart_points": [24, 28, 32, 40, 50, 44, 38, 30, 20],
+        "levels": [
+            {"label": "89 EMA Zone", "value": 38, "color": "#63efc1"},
+            {"label": "Entry", "value": 30, "color": "#f6c15c"},
+            {"label": "SL", "value": 48, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "breakout",
+        "name": "Breakout and Retest",
+        "category": "Option Buying",
+        "market_type": "Expansion",
+        "strike_rate": "58%",
+        "summary": "Trade a clear range breakout after price closes outside resistance or support and then retests the breakout level.",
+        "timeframe": "5 min, 15 min, or daily breakout setups",
+        "strike_selection": "Buy ATM call above resistance breakout. Buy ATM put below support breakdown. For high volatility, prefer slightly ITM options.",
+        "entry": "Enter on successful retest candle after breakout, not on the first emotional candle.",
+        "stop_loss": "SL below retest low for upside breakout or above retest high for downside breakdown.",
+        "targets": "Project the prior range height and use that as the first objective.",
+        "chart_focus": "The chart should show range, breakout candle, retest into breakout zone, then continuation.",
+        "steps": [
+            "Mark the range clearly before the breakout happens.",
+            "Require close outside the range with volume confirmation.",
+            "Use the retest to reduce poor chase entries.",
+            "Exit fast if price falls back inside the range."
+        ],
+        "chart_type": "breakout",
+        "chart_points": [62, 62, 61, 62, 61, 44, 43, 41, 28],
+        "levels": [
+            {"label": "Breakout Zone", "value": 43, "color": "#63efc1"},
+            {"label": "Entry", "value": 38, "color": "#f6c15c"},
+            {"label": "SL", "value": 48, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "reversal",
+        "name": "Reversal at Support / Resistance",
+        "category": "Option Buying",
+        "market_type": "Mean Reversion",
+        "strike_rate": "52%",
+        "summary": "Look for exhaustion at major support or resistance with RSI divergence, rejection wicks, or failed breakdown and breakout moves.",
+        "timeframe": "15 min, 1 hour, or daily swing levels",
+        "strike_selection": "Use ATM options only after rejection confirms. Avoid far OTM strikes because reversals need clean speed.",
+        "entry": "Enter after the reversal candle closes and the next candle takes out the reversal trigger high or low.",
+        "stop_loss": "SL beyond the rejection wick or level failure point.",
+        "targets": "First target is the middle of the range. Final target is the opposite side of the structure.",
+        "chart_focus": "The chart should show a flush into support or spike into resistance followed by a failure candle and reversal trigger.",
+        "steps": [
+            "Focus on major levels, not random intraday noise.",
+            "Need rejection wick, divergence, or failed breakdown.",
+            "Take profits quicker than trend trades.",
+            "Avoid reversal trades against strong trend momentum."
+        ],
+        "chart_type": "reversal",
+        "chart_points": [34, 40, 48, 55, 66, 74, 78, 60, 28],
+        "levels": [
+            {"label": "Reversal Zone", "value": 74, "color": "#63efc1"},
+            {"label": "Entry", "value": 62, "color": "#f6c15c"},
+            {"label": "SL", "value": 80, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "vwap-reclaim",
+        "name": "VWAP Reclaim / Rejection",
+        "category": "Option Buying",
+        "market_type": "Intraday",
+        "strike_rate": "57%",
+        "summary": "Use VWAP as the session bias line. Long above reclaim, short below rejection.",
+        "timeframe": "3 min, 5 min, or 15 min",
+        "strike_selection": "Buy ATM call after bullish reclaim above VWAP. Buy ATM put after bearish rejection below VWAP.",
+        "entry": "Take the trade only after a reclaim or rejection candle closes with momentum.",
+        "stop_loss": "SL just below VWAP reclaim low for calls or above rejection high for puts.",
+        "targets": "Use opening range high or low, day high or low, or 1:2 reward objective.",
+        "chart_focus": "The chart should show price crossing VWAP, retesting it, and then extending away with momentum.",
+        "steps": [
+            "Best on strong index days with one-sided breadth.",
+            "Skip if price keeps slicing through VWAP repeatedly.",
+            "Pair with volume and opening range for better quality.",
+            "Tight SL is critical because VWAP chops quickly."
+        ],
+        "chart_type": "trend",
+        "chart_points": [60, 59, 58, 54, 48, 44, 36, 24, 16],
+        "levels": [
+            {"label": "VWAP", "value": 44, "color": "#63efc1"},
+            {"label": "Entry", "value": 35, "color": "#f6c15c"},
+            {"label": "SL", "value": 50, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "iron-condor",
+        "name": "Iron Condor",
+        "category": "Option Selling",
+        "market_type": "Range Bound",
+        "strike_rate": "68%",
+        "summary": "Sell an OTM call spread and an OTM put spread when you expect the index or stock to stay within a defined range.",
+        "timeframe": "Usually positional or expiry-week range setups",
+        "strike_selection": "Sell call above resistance and sell put below support. Buy further OTM wings to cap risk.",
+        "entry": "Enter when implied volatility is elevated and the underlying is trading inside a stable range.",
+        "stop_loss": "Exit if spot breaks the short strike zone with momentum or if the spread loss hits predefined risk.",
+        "targets": "Target time decay and partial profit at 40% to 60% of max credit.",
+        "chart_focus": "The chart should show a flat central profit zone and loss outside both wings.",
+        "steps": [
+            "Best when IV is high and directional conviction is low.",
+            "Keep strikes outside key support and resistance.",
+            "Avoid if large event risk is near.",
+            "Adjust or exit quickly if one side is threatened."
+        ],
+        "chart_type": "payoff",
+        "chart_points": [78, 62, 42, 28, 24, 28, 42, 62, 78],
+        "levels": [
+            {"label": "Put Short", "value": 30, "color": "#63efc1"},
+            {"label": "Call Short", "value": 70, "color": "#63efc1"},
+            {"label": "Profit Zone", "value": 24, "color": "#f6c15c"}
+        ]
+    },
+    {
+        "slug": "bull-call-spread",
+        "name": "Bull Call Spread",
+        "category": "Option Buying",
+        "market_type": "Moderately Bullish",
+        "strike_rate": "60%",
+        "summary": "Buy a lower strike call and sell a higher strike call to express a bullish view with limited cost.",
+        "timeframe": "Swing or event-driven setup",
+        "strike_selection": "Buy near ATM call and sell 1 to 2 strikes above to reduce premium outflow.",
+        "entry": "Enter when bullish structure is confirmed but implied volatility or premium is expensive.",
+        "stop_loss": "Exit if spot invalidates the bullish setup or spread value loses planned risk.",
+        "targets": "Target max spread width minus debit, or book early near resistance.",
+        "chart_focus": "The chart should show capped upside payoff with limited initial debit risk.",
+        "steps": [
+            "Good when you expect upside but not a runaway trend.",
+            "Works better than naked calls in expensive IV conditions.",
+            "Know the maximum reward before entering.",
+            "Prefer defined event windows or strong swing setups."
+        ],
+        "chart_type": "payoff",
+        "chart_points": [76, 74, 68, 58, 46, 36, 28, 24, 24],
+        "levels": [
+            {"label": "Long Call", "value": 45, "color": "#63efc1"},
+            {"label": "Short Call", "value": 68, "color": "#f6c15c"},
+            {"label": "Max Profit Cap", "value": 24, "color": "#ff6f7d"}
+        ]
+    },
+    {
+        "slug": "bear-put-spread",
+        "name": "Bear Put Spread",
+        "category": "Option Buying",
+        "market_type": "Moderately Bearish",
+        "strike_rate": "59%",
+        "summary": "Buy a higher strike put and sell a lower strike put to participate in downside while controlling premium decay.",
+        "timeframe": "Swing bearish setup or event hedge",
+        "strike_selection": "Buy near ATM put and sell 1 to 2 strikes lower to reduce overall debit.",
+        "entry": "Enter on breakdown confirmation, failed pullback, or bearish rejection at resistance.",
+        "stop_loss": "Exit if price reclaims the breakdown level or if the spread loses the planned premium risk.",
+        "targets": "Aim for move into the next support zone or full spread value expansion.",
+        "chart_focus": "The chart should show downside profit that flattens after the short put strike is reached.",
+        "steps": [
+            "Useful when bearish view is strong but downside may not be unlimited.",
+            "Lower debit helps compared with a naked put.",
+            "Use support levels to position the short strike.",
+            "Do not hold blindly if the setup fails quickly."
+        ],
+        "chart_type": "payoff",
+        "chart_points": [24, 24, 30, 40, 52, 64, 72, 76, 78],
+        "levels": [
+            {"label": "Long Put", "value": 44, "color": "#63efc1"},
+            {"label": "Short Put", "value": 28, "color": "#f6c15c"},
+            {"label": "Max Profit Cap", "value": 78, "color": "#ff6f7d"}
+        ]
+    }
+]
+
 
 def normalize_user_input(user_input):
     return " ".join(str(user_input).strip().upper().split())
@@ -1474,6 +1693,10 @@ def terms():
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+@app.route("/strategies")
+def strategies():
+    return render_template("strategies.html", strategies=STRATEGY_LIBRARY)
 
 @app.route("/live-data/<symbol>")
 def live_data(symbol):
