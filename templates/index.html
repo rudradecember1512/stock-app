@@ -2818,11 +2818,11 @@
                 <div class="result-summary-card">
                     <div class="result-summary-head">
                         <div>
-                            <div class="result-summary-kicker">Structured Result</div>
+                            <div class="result-summary-kicker">Company Snapshot</div>
                             <div class="result-summary-title" id="summaryStockTitle">{{ data.name }}</div>
-                            <div class="result-summary-subtitle" id="summaryTickerValue">{{ data.symbol }}</div>
+                            <div class="result-summary-subtitle" id="summaryTickerValue">{{ data.symbol }} | {{ data.sector }}</div>
                         </div>
-                        <div class="verdict-pill verdict-hold" id="summaryVerdictPill">{{ data.signal }}</div>
+                        <div class="verdict-pill verdict-hold" id="summaryVerdictPill">{{ data.valuation_status }}</div>
                     </div>
                     <div class="result-summary-grid">
                         <div class="result-summary-item">
@@ -2836,17 +2836,17 @@
                             </div>
                         </div>
                         <div class="result-summary-item">
-                            <div class="result-summary-label">AI Verdict</div>
-                            <div class="result-summary-value" id="summaryVerdictText">{{ data.signal }}</div>
+                            <div class="result-summary-label">Sector</div>
+                            <div class="result-summary-value" id="summarySectorValue">{{ data.sector }}</div>
                         </div>
                         <div class="result-summary-item">
-                            <div class="result-summary-label">Confidence Score</div>
-                            <div class="result-summary-value" id="summaryConfidenceValue">{{ data.setup_score }}%</div>
+                            <div class="result-summary-label">Valuation Status</div>
+                            <div class="result-summary-value" id="summaryValuationStatusValue">{{ data.valuation_status }}</div>
                         </div>
                     </div>
                     <div class="result-reason-box">
-                        <div class="result-summary-label">Key Insights / Reasoning</div>
-                        <div class="result-reason-text" id="summaryReasonValue">{{ data.signal_reason }}</div>
+                        <div class="result-summary-label">AI Insight / Reasoning</div>
+                        <div class="result-reason-text" id="summaryReasonValue">{{ ai_summary or data.signal_reason }}</div>
                     </div>
                 </div>
 
@@ -2886,224 +2886,115 @@
 
                 <div class="feature-ribbon">
                     <div class="feature-card">
-                        <div class="feature-label">Buy / Sell Signal</div>
-                        <div class="feature-value" id="signalFeatureValue">{{ data.signal }}</div>
-                        <div class="feature-note" id="signalFeatureNote">{{ data.signal_reason }}</div>
+                        <div class="feature-label">Sector</div>
+                        <div class="feature-value" id="sectorFeatureValue">{{ data.sector }}</div>
+                        <div class="feature-note">Primary business classification for the company.</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-label">Risk Score</div>
-                        <div class="feature-value" id="riskScoreValue">{{ data.risk_score }}/100</div>
-                        <div class="feature-note" id="riskScoreNote">{{ data.risk_score_label }}. {{ data.risk_reason }}</div>
+                        <div class="feature-label">Total Shares</div>
+                        <div class="feature-value" id="totalSharesValue">{{ data.total_shares }}</div>
+                        <div class="feature-note">Outstanding equity units currently issued by the company.</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-label">AI Explanation</div>
-                        <div class="feature-value" id="aiReasonValue">Why this stock?</div>
-                        <div class="feature-note" id="aiReasonNote">{{ ai_summary if ai_summary else 'Technical and news context will appear here after analysis.' }}</div>
+                        <div class="feature-label">Valuation</div>
+                        <div class="feature-value" id="valuationValue">{{ data.valuation }}</div>
+                        <div class="feature-note">Enterprise-value style snapshot of the company scale.</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-label">News Sentiment</div>
-                        <div class="feature-value" id="newsFeatureValue">{{ data.news_sentiment }}</div>
-                        <div class="feature-note" id="newsFeatureNote">Headline flow is being used as a sentiment overlay on the technical setup.</div>
+                        <div class="feature-label">Valuation Status</div>
+                        <div class="feature-value" id="valuationStatusValue">{{ data.valuation_status }}</div>
+                        <div class="feature-note">Rule-based read on whether valuation looks fair, premium, or potentially undervalued.</div>
                     </div>
-                </div>
-
-                <div class="portfolio-panel">
-                    <div class="portfolio-head">
-                        <div>
-                            <div class="portfolio-title">Portfolio Tracking</div>
-                            <div class="portfolio-subtitle">Save the current stock as a position, track invested value, mark-to-market value, and live profit or loss locally in your browser.</div>
-                        </div>
-                    </div>
-                    <div class="portfolio-form">
-                        <div class="portfolio-field">
-                            <input type="text" id="portfolioSymbolInput" value="{{ data.symbol }}" readonly>
-                        </div>
-                        <div class="portfolio-field">
-                            <input type="number" id="portfolioSharesInput" min="0" step="0.01" placeholder="Shares / Qty">
-                        </div>
-                        <div class="portfolio-field">
-                            <input type="number" id="portfolioCostInput" min="0" step="0.01" placeholder="Average Cost">
-                        </div>
-                        <button type="button" class="portfolio-action" id="addPortfolioBtn">Add Position</button>
-                    </div>
-                    <div class="portfolio-summary" id="portfolioSummary"></div>
-                    <div class="portfolio-list" id="portfolioList"></div>
                 </div>
 
                 <div class="brief-grid">
                     <div class="brief-card">
-                        <div class="brief-kicker">Trade Setup Score</div>
-                        <div class="brief-score-row">
-                            <div class="brief-score" id="setupScoreValue">{{ data.setup_score }}<span>/100</span></div>
-                            <div class="brief-label" id="setupLabelValue">{{ data.setup_label }}</div>
-                        </div>
-                        <div class="score-bar">
-                            <div class="score-fill" id="setupScoreFill" style="width: {{ data.setup_score }}%;"></div>
-                        </div>
+                        <div class="brief-kicker">Valuation Multiples</div>
                         <div class="brief-points">
                             <div class="brief-point">
-                                <div class="brief-point-label">Risk Profile</div>
-                                <div class="brief-point-value" id="riskLevelValue">{{ data.risk_level }}</div>
+                                <div class="brief-point-label">P/E Ratio</div>
+                                <div class="brief-point-value" id="peValue">{{ data.pe_ratio }}</div>
                             </div>
                             <div class="brief-point">
-                                <div class="brief-point-label">News Sentiment</div>
-                                <div class="brief-point-value" id="newsSentimentValue">{{ data.news_sentiment }}</div>
+                                <div class="brief-point-label">Price to Book</div>
+                                <div class="brief-point-value" id="priceToBookValue">{{ data.price_to_book }}</div>
                             </div>
                             <div class="brief-point">
-                                <div class="brief-point-label">Average Volume</div>
-                                <div class="brief-point-value" id="avgVolumeValue">{{ data.avg_volume }}</div>
+                                <div class="brief-point-label">PEG Ratio</div>
+                                <div class="brief-point-value" id="pegRatioValue">{{ data.peg_ratio }}</div>
                             </div>
                             <div class="brief-point">
-                                <div class="brief-point-label">Volume vs Avg</div>
-                                <div class="brief-point-value" id="volumeVsAvgValue">
-                                    {% if data.volume_vs_avg == 'N/A' %}N/A{% else %}{{ data.volume_vs_avg }}%{% endif %}
-                                </div>
+                                <div class="brief-point-label">Dividend Yield</div>
+                                <div class="brief-point-value" id="dividendYieldValue">{{ data.dividend_yield }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">BVPS</div>
+                                <div class="brief-point-value" id="bvpsValue">{{ data.bvps }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">Latest EPS</div>
+                                <div class="brief-point-value" id="latestEpsValue">{{ data.latest_eps }}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="brief-card range-card">
-                        <div class="brief-kicker">Positioning</div>
-                        <div class="range-values">
+                        <div class="brief-kicker">Enterprise Value and Returns</div>
+                        <div class="brief-points">
                             <div class="brief-point">
-                                <div class="brief-point-label">52W Low</div>
-                                <div class="brief-point-value" id="weekLowValue">{{ data.week_52_low }}</div>
+                                <div class="brief-point-label">EV / EBIT</div>
+                                <div class="brief-point-value" id="evToEbitValue">{{ data.ev_to_ebit }}</div>
                             </div>
                             <div class="brief-point">
-                                <div class="brief-point-label">52W High</div>
-                                <div class="brief-point-value" id="weekHighValue">{{ data.week_52_high }}</div>
+                                <div class="brief-point-label">EV / EBITDA</div>
+                                <div class="brief-point-value" id="evToEbitdaValue">{{ data.ev_to_ebitda }}</div>
                             </div>
-                        </div>
-                        <div class="range-track">
-                            <div class="range-marker" id="rangeMarker" style="left: {{ data.price_position_52w if data.price_position_52w != 'N/A' else 50 }}%;"></div>
-                        </div>
-                        <div class="insight-row">
-                            <div class="insight-chip">
-                                <strong id="volumeTrendValue">{{ data.volume_trend }}</strong>
-                                <span>Current participation versus the stock's typical trading activity.</span>
+                            <div class="brief-point">
+                                <div class="brief-point-label">EV / Capital Employed</div>
+                                <div class="brief-point-value" id="evToCapitalEmployedValue">{{ data.ev_to_capital_employed }}</div>
                             </div>
-                            <div class="insight-chip">
-                                <strong id="betaValue">{% if data.beta == 'N/A' %}N/A{% else %}Beta {{ data.beta }}{% endif %}</strong>
-                                <span id="pricePositionValue">
-                                    {% if data.price_position_52w == 'N/A' %}
-                                        52-week position is not available.
-                                    {% else %}
-                                        Trading at {{ data.price_position_52w }}% of its recent range.
-                                    {% endif %}
-                                </span>
+                            <div class="brief-point">
+                                <div class="brief-point-label">EV / Sales</div>
+                                <div class="brief-point-value" id="evToSalesValue">{{ data.ev_to_sales }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">ROCE (Latest)</div>
+                                <div class="brief-point-value" id="roceLatestValue">{{ data.roce_latest }}</div>
+                            </div>
+                            <div class="brief-point">
+                                <div class="brief-point-label">ROE (Latest)</div>
+                                <div class="brief-point-value" id="roeLatestValue">{{ data.roe_latest }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="signal-box">
-                    <div class="signal-title">Indicator Signal</div>
-                    <div class="signal-value
-                        {% if 'Buy' in data.signal or 'Bullish' in data.signal or 'Reversal' in data.signal %}
-                            positive
-                        {% elif 'Sell' in data.signal or 'Bearish' in data.signal or 'Caution' in data.signal %}
-                            negative
-                        {% else %}
-                            neutral
-                        {% endif %}
-                    " id="signalValue">
-                        {{ data.signal }}
-                    </div>
-                    <div class="signal-reason" id="signalReason">{{ data.signal_reason }}</div>
-                </div>
-
-                <div class="desk-grid">
-                    <div class="desk-card">
-                        <div class="desk-head">
-                            <div>
-                                <div class="desk-kicker">Trade Plan</div>
-                                <div class="desk-title">Execution Map</div>
-                            </div>
-                            <div class="desk-badge" id="planBiasBadge">{{ data.signal }}</div>
+                <div class="brief-card" style="margin-bottom:18px;">
+                    <div class="brief-kicker">Quarterly and Return Snapshot</div>
+                    <div class="brief-points">
+                        <div class="brief-point">
+                            <div class="brief-point-label">Q1 Performance</div>
+                            <div class="brief-point-value" id="q1PerformanceValue">{{ data.q1_performance }}</div>
                         </div>
-                        <div class="desk-note" id="planSummaryText">Levels, ATR, and current structure are combined into a working execution map.</div>
-                        <div class="plan-grid">
-                            <div class="plan-item">
-                                <span class="plan-label">Entry Zone</span>
-                                <div class="plan-value" id="planEntryValue">Calculating...</div>
-                            </div>
-                            <div class="plan-item">
-                                <span class="plan-label">Protective Stop</span>
-                                <div class="plan-value" id="planStopValue">Calculating...</div>
-                            </div>
-                            <div class="plan-item">
-                                <span class="plan-label">Upside Trigger</span>
-                                <div class="plan-value" id="planUpsideValue">Calculating...</div>
-                            </div>
-                            <div class="plan-item">
-                                <span class="plan-label">Breakdown Path</span>
-                                <div class="plan-value" id="planBreakdownValue">Calculating...</div>
-                            </div>
+                        <div class="brief-point">
+                            <div class="brief-point-label">Q2 Performance</div>
+                            <div class="brief-point-value" id="q2PerformanceValue">{{ data.q2_performance }}</div>
                         </div>
-                    </div>
-
-                    <div class="desk-card">
-                        <div class="desk-head">
-                            <div>
-                                <div class="desk-kicker">Relative Strength</div>
-                                <div class="desk-title">Benchmark Compare</div>
-                            </div>
-                            <select class="desk-select" id="benchmarkSelect"></select>
+                        <div class="brief-point">
+                            <div class="brief-point-label">Q3 Performance</div>
+                            <div class="brief-point-value" id="q3PerformanceValue">{{ data.q3_performance }}</div>
                         </div>
-                        <div class="desk-note" id="benchmarkSummaryText">Compare this setup against a live benchmark to see whether the stock is leading or lagging.</div>
-                        <div class="desk-mini-grid">
-                            <div class="desk-mini-card">
-                                <span>Benchmark</span>
-                                <strong id="benchmarkNameValue">Nifty 50</strong>
-                            </div>
-                            <div class="desk-mini-card">
-                                <span>Benchmark Move</span>
-                                <strong id="benchmarkDeltaValue">--</strong>
-                            </div>
-                            <div class="desk-mini-card">
-                                <span>Relative Edge</span>
-                                <strong id="benchmarkAlphaValue">--</strong>
-                            </div>
+                        <div class="brief-point">
+                            <div class="brief-point-label">Q4 Performance</div>
+                            <div class="brief-point-value" id="q4PerformanceValue">{{ data.q4_performance }}</div>
                         </div>
-                        <div class="desk-divider"></div>
-                        <div class="plan-grid">
-                            <div class="plan-item">
-                                <span class="plan-label">Benchmark Trend</span>
-                                <div class="plan-value" id="benchmarkTrendValue">Unavailable</div>
-                            </div>
-                            <div class="plan-item">
-                                <span class="plan-label">Benchmark Price</span>
-                                <div class="plan-value" id="benchmarkPriceValue">N/A</div>
-                            </div>
+                        <div class="brief-point">
+                            <div class="brief-point-label">QoQ</div>
+                            <div class="brief-point-value" id="qoqPerformanceValue">{{ data.qoq_performance }}</div>
                         </div>
-                    </div>
-
-                    <div class="desk-card">
-                        <div class="desk-head">
-                            <div>
-                                <div class="desk-kicker">Session Structure</div>
-                                <div class="desk-title">Desk Readout</div>
-                            </div>
-                            <div class="desk-badge" id="structureBiasBadge">{{ data.setup_label }}</div>
-                        </div>
-                        <div class="desk-note" id="structureSummaryText">A concise readout of trend, momentum, range location, and active timeframe.</div>
-                        <div class="structure-grid">
-                            <div class="structure-item">
-                                <span class="structure-label">Trend Stack</span>
-                                <div class="structure-value" id="structureTrendValue">Loading...</div>
-                            </div>
-                            <div class="structure-item">
-                                <span class="structure-label">Momentum</span>
-                                <div class="structure-value" id="structureMomentumValue">Loading...</div>
-                            </div>
-                            <div class="structure-item">
-                                <span class="structure-label">Range Context</span>
-                                <div class="structure-value" id="structureRangeValue">Loading...</div>
-                            </div>
-                            <div class="structure-item">
-                                <span class="structure-label">Active Timeframe</span>
-                                <div class="structure-value" id="structureTimeframeValue">{{ data.display_period }}</div>
-                            </div>
+                        <div class="brief-point">
+                            <div class="brief-point-label">Latest EPS</div>
+                            <div class="brief-point-value" id="latestEpsQuarterValue">{{ data.latest_eps }}</div>
                         </div>
                     </div>
                 </div>
@@ -3182,9 +3073,9 @@
                     </div>
 
                     <div class="detail-box">
-                        <div class="label">Status</div>
-                        <div class="value {% if data.change >= 0 %}positive{% else %}negative{% endif %}" id="statusValue">
-                            {% if data.change >= 0 %}Bullish{% else %}Bearish{% endif %}
+                        <div class="label">Valuation Status</div>
+                        <div class="value" id="statusValue">
+                            {{ data.valuation_status }}
                         </div>
                     </div>
 
@@ -3285,6 +3176,29 @@
                             {% if data.change >= 0 %}Positive Bias{% else %}Cautious Bias{% endif %}
                         </div>
                     </div>
+                </div>
+
+                <div class="portfolio-panel">
+                    <div class="portfolio-head">
+                        <div>
+                            <div class="portfolio-title">Portfolio Tracking</div>
+                            <div class="portfolio-subtitle">Save the current stock as a position, track invested value, mark-to-market value, and live profit or loss locally in your browser.</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-form">
+                        <div class="portfolio-field">
+                            <input type="text" id="portfolioSymbolInput" value="{{ data.symbol }}" readonly>
+                        </div>
+                        <div class="portfolio-field">
+                            <input type="number" id="portfolioSharesInput" min="0" step="0.01" placeholder="Shares / Qty">
+                        </div>
+                        <div class="portfolio-field">
+                            <input type="number" id="portfolioCostInput" min="0" step="0.01" placeholder="Average Cost">
+                        </div>
+                        <button type="button" class="portfolio-action" id="addPortfolioBtn">Add Position</button>
+                    </div>
+                    <div class="portfolio-summary" id="portfolioSummary"></div>
+                    <div class="portfolio-list" id="portfolioList"></div>
                 </div>
 
                 <div class="chart-box">
@@ -3938,12 +3852,12 @@
             copySnapshotBtn.addEventListener('click', async () => {
                 const name = document.getElementById('stockName')?.textContent || '';
                 const symbol = document.getElementById('stockSymbol')?.textContent || '';
-                const signal = document.getElementById('signalValue')?.textContent || '';
                 const price = document.getElementById('priceValue')?.textContent || '';
-                const rsi = document.getElementById('rsiValue')?.textContent || '';
-                const macd = document.getElementById('macdValue')?.textContent || '';
-                const score = document.getElementById('setupScoreValue')?.textContent || '';
-                const snapshot = `${name} (${symbol})\nPrice: ${price}\nSignal: ${signal}\nRSI: ${rsi}\nMACD: ${macd}\nSetup Score: ${score}`;
+                const sector = document.getElementById('summarySectorValue')?.textContent || '';
+                const valuation = document.getElementById('summaryValuationStatusValue')?.textContent || '';
+                const peRatio = document.getElementById('peValue')?.textContent || '';
+                const latestEps = document.getElementById('latestEpsValue')?.textContent || '';
+                const snapshot = `${name} (${symbol})\nPrice: ${price}\nSector: ${sector}\nValuation Status: ${valuation}\nP/E Ratio: ${peRatio}\nLatest EPS: ${latestEps}`;
                 await navigator.clipboard.writeText(snapshot);
                 copySnapshotBtn.textContent = 'Copied';
                 setTimeout(() => { copySnapshotBtn.textContent = 'Copy Snapshot'; }, 1200);
@@ -4020,6 +3934,28 @@
             price: {{ data.price | tojson }},
             percent: {{ data.percent | tojson }},
             currency: {{ data.currency | tojson }},
+            sector: {{ data.sector | tojson }},
+            market_cap: {{ data.market_cap | tojson }},
+            total_shares: {{ data.total_shares | tojson }},
+            valuation: {{ data.valuation | tojson }},
+            valuation_status: {{ data.valuation_status | tojson }},
+            pe_ratio: {{ data.pe_ratio | tojson }},
+            price_to_book: {{ data.price_to_book | tojson }},
+            ev_to_ebit: {{ data.ev_to_ebit | tojson }},
+            ev_to_ebitda: {{ data.ev_to_ebitda | tojson }},
+            ev_to_capital_employed: {{ data.ev_to_capital_employed | tojson }},
+            ev_to_sales: {{ data.ev_to_sales | tojson }},
+            peg_ratio: {{ data.peg_ratio | tojson }},
+            dividend_yield: {{ data.dividend_yield | tojson }},
+            roce_latest: {{ data.roce_latest | tojson }},
+            roe_latest: {{ data.roe_latest | tojson }},
+            bvps: {{ data.bvps | tojson }},
+            latest_eps: {{ data.latest_eps | tojson }},
+            q1_performance: {{ data.q1_performance | tojson }},
+            q2_performance: {{ data.q2_performance | tojson }},
+            q3_performance: {{ data.q3_performance | tojson }},
+            q4_performance: {{ data.q4_performance | tojson }},
+            qoq_performance: {{ data.qoq_performance | tojson }},
             signal: {{ data.signal | tojson }},
             signal_reason: {{ data.signal_reason | tojson }},
             setup_score: {{ data.setup_score | tojson }},
@@ -4036,6 +3972,7 @@
             risk_score_label: {{ data.risk_score_label | tojson }},
             risk_reason: {{ data.risk_reason | tojson }},
             news_sentiment: {{ data.news_sentiment | tojson }},
+            ai_summary: {{ ai_summary | tojson }},
             support_levels: {{ data.support_levels | tojson }},
             resistance_levels: {{ data.resistance_levels | tojson }}
         };
@@ -4155,7 +4092,7 @@
             stopEl.textContent = formatPlanCurrency(stopValue, stock.currency);
             upsideEl.textContent = upsideLabel;
             breakdownEl.textContent = breakdownLabel;
-            biasBadge.textContent = stock.signal || 'Neutral';
+            biasBadge.textContent = stock.valuation_status || 'Fairly Valued';
             summaryEl.textContent = bullishStack
                 ? 'Trend structure still favors pullback entries while resistance levels define the upside ladder.'
                 : 'Structure is not fully supportive, so confirmation above resistance matters more than early entry.';
@@ -4328,6 +4265,104 @@
             if (stochValue) stochValue.textContent = `${stock.stoch_k || 'N/A'}/${stock.stoch_d || 'N/A'}`;
             if (participationValue) participationValue.textContent = stock.volume_trend || 'Normal';
             if (regimeValue) regimeValue.textContent = stock.setup_label || 'Balanced';
+            if (portfolioSymbolInput) portfolioSymbolInput.value = stock.symbol || '';
+        }
+
+        function getValuationMeta(status) {
+            const text = String(status || '').toLowerCase();
+            if (text.includes('undervalued')) {
+                return { text: status || 'Potentially Undervalued', pillClass: 'verdict-buy' };
+            }
+            if (text.includes('premium') || text.includes('overvalued')) {
+                return { text: status || 'Premium Valuation', pillClass: 'verdict-sell' };
+            }
+            return { text: status || 'Fairly Valued', pillClass: 'verdict-hold' };
+        }
+
+        function setTextById(id, value) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value ?? 'N/A';
+            return element;
+        }
+
+        function updateVerdictSummary(stock) {
+            const summaryStockTitle = document.getElementById('summaryStockTitle');
+            const summaryTickerValue = document.getElementById('summaryTickerValue');
+            const summaryNameValue = document.getElementById('summaryNameValue');
+            const summaryPriceValue = document.getElementById('summaryPriceValue');
+            const summarySectorValue = document.getElementById('summarySectorValue');
+            const summaryValuationStatusValue = document.getElementById('summaryValuationStatusValue');
+            const summaryReasonValue = document.getElementById('summaryReasonValue');
+            const summaryVerdictPill = document.getElementById('summaryVerdictPill');
+            if (!summaryStockTitle || !summaryVerdictPill) return;
+
+            const valuation = getValuationMeta(stock.valuation_status);
+            summaryStockTitle.textContent = stock.name || 'N/A';
+            summaryTickerValue.textContent = `${stock.symbol || 'N/A'} | ${stock.sector || 'Unknown Sector'}`;
+            summaryNameValue.textContent = `${stock.name || 'Stock'} (${stock.symbol || 'N/A'})`;
+            summaryPriceValue.textContent = formatCurrency(stock.price, stock.currency);
+            if (summarySectorValue) summarySectorValue.textContent = stock.sector || 'N/A';
+            if (summaryValuationStatusValue) summaryValuationStatusValue.textContent = stock.valuation_status || 'N/A';
+            if (summaryReasonValue) {
+                summaryReasonValue.textContent =
+                    stock.ai_summary
+                    || stock.signal_reason
+                    || 'Valuation, profitability, and quarterly performance are shaping this company snapshot.';
+            }
+            summaryVerdictPill.textContent = valuation.text;
+            summaryVerdictPill.className = `verdict-pill ${valuation.pillClass}`;
+        }
+
+        function updateBriefInsights(stock) {
+            const aiReasonNote = document.getElementById('aiReasonNote');
+
+            updateVerdictSummary(stock);
+            setTextById('sectorFeatureValue', stock.sector || 'N/A');
+            setTextById('totalSharesValue', stock.total_shares || 'N/A');
+            setTextById('valuationValue', stock.valuation || 'N/A');
+            setTextById('valuationStatusValue', stock.valuation_status || 'N/A');
+            setTextById('peValue', stock.pe_ratio || 'N/A');
+            setTextById('priceToBookValue', stock.price_to_book || 'N/A');
+            setTextById('pegRatioValue', stock.peg_ratio || 'N/A');
+            setTextById('dividendYieldValue', stock.dividend_yield || 'N/A');
+            setTextById('bvpsValue', stock.bvps || 'N/A');
+            setTextById('latestEpsValue', stock.latest_eps || 'N/A');
+            setTextById('latestEpsQuarterValue', stock.latest_eps || 'N/A');
+            setTextById('evToEbitValue', stock.ev_to_ebit || 'N/A');
+            setTextById('evToEbitdaValue', stock.ev_to_ebitda || 'N/A');
+            setTextById('evToCapitalEmployedValue', stock.ev_to_capital_employed || 'N/A');
+            setTextById('evToSalesValue', stock.ev_to_sales || 'N/A');
+            setTextById('roceLatestValue', stock.roce_latest || 'N/A');
+            setTextById('roeLatestValue', stock.roe_latest || 'N/A');
+            setTextById('q1PerformanceValue', stock.q1_performance || 'N/A');
+            setTextById('q2PerformanceValue', stock.q2_performance || 'N/A');
+            setTextById('q3PerformanceValue', stock.q3_performance || 'N/A');
+            setTextById('q4PerformanceValue', stock.q4_performance || 'N/A');
+            setTextById('qoqPerformanceValue', stock.qoq_performance || 'N/A');
+            if (aiReasonNote && stock.ai_summary) aiReasonNote.textContent = stock.ai_summary;
+
+            const emaTrendValue = document.getElementById('emaTrendValue');
+            const emaTrendNote = document.getElementById('emaTrendNote');
+            const bbPositionValue = document.getElementById('bbPositionValue');
+            const bbValuesNote = document.getElementById('bbValuesNote');
+            const atrValue = document.getElementById('atrValue');
+            const stochValue = document.getElementById('stochValue');
+            const participationValue = document.getElementById('participationValue');
+            const regimeValue = document.getElementById('regimeValue');
+
+            if (emaTrendValue) {
+                emaTrendValue.textContent =
+                    stock.ema20 !== 'N/A' && stock.ema50 !== 'N/A'
+                        ? (stock.ema20 > stock.ema50 ? 'Bullish Stack' : 'Bearish Stack')
+                        : 'N/A';
+            }
+            if (emaTrendNote) emaTrendNote.textContent = `EMA20: ${stock.ema20} | EMA50: ${stock.ema50}`;
+            if (bbPositionValue) bbPositionValue.textContent = stock.bb_position || 'N/A';
+            if (bbValuesNote) bbValuesNote.textContent = `Upper ${stock.bb_upper} | Lower ${stock.bb_lower}`;
+            if (atrValue) atrValue.textContent = stock.atr || 'N/A';
+            if (stochValue) stochValue.textContent = `${stock.stoch_k || 'N/A'}/${stock.stoch_d || 'N/A'}`;
+            if (participationValue) participationValue.textContent = stock.total_shares || 'N/A';
+            if (regimeValue) regimeValue.textContent = stock.valuation_status || 'Fairly Valued';
             if (portfolioSymbolInput) portfolioSymbolInput.value = stock.symbol || '';
         }
 
@@ -4923,35 +4958,123 @@
             }
         }
 
+        async function refreshLiveData() {
+            if (!currentSymbol) return;
+
+            try {
+                const response = await fetch(`/live-data/${encodeURIComponent(currentSymbol)}?period=${encodeURIComponent(currentPeriod)}`);
+                const result = await response.json();
+
+                if (!result.success) return;
+
+                const stock = result.data;
+                currentSymbol = stock.symbol || currentSymbol;
+                window.currentSymbol = currentSymbol;
+
+                labels = result.chart_labels || [];
+                priceData = result.chart_prices || [];
+                candleData = result.candle_data || [];
+                volumeData = result.volume_values || [];
+                volumeColors = result.volume_colors || [];
+                macdData = result.macd_values || [];
+                signalData = result.signal_values || [];
+                stochKData = result.stoch_k_values || [];
+                stochDData = result.stoch_d_values || [];
+                ema20Series = result.ema20_values || [];
+                ema50Series = result.ema50_values || [];
+                bbUpperSeries = result.bb_upper_values || [];
+                bbMiddleSeries = result.bb_middle_values || [];
+                bbLowerSeries = result.bb_lower_values || [];
+                supportLevels = result.support_levels || [];
+                resistanceLevels = result.resistance_levels || [];
+                checklistItems = stock.checklist_items || [];
+                currentStockSnapshot = {
+                    ...stock,
+                    ai_summary: result.ai_summary || stock.ai_summary || currentStockSnapshot.ai_summary,
+                    display_period: result.display_period || stock.display_period || currentPeriod.toUpperCase(),
+                    support_levels: supportLevels,
+                    resistance_levels: resistanceLevels
+                };
+
+                setTextById('stockName', stock.name || 'N/A');
+                setTextById('stockSymbol', stock.symbol || 'N/A');
+                setTextById('sectorValue', stock.sector || 'N/A');
+                setTextById('marketCapValue', stock.market_cap || 'N/A');
+                setTextById('peValue', stock.pe_ratio || 'N/A');
+                setTextById('volumeValue', stock.volume || 'N/A');
+                setTextById('rsiValue', stock.rsi || 'N/A');
+                setTextById('macdValue', stock.macd || 'N/A');
+                setTextById('signalLineValue', stock.signal_line || 'N/A');
+                setTextById('lastUpdated', `Last updated: ${new Date().toLocaleTimeString()}`);
+                setTextById('priceValue', formatCurrency(stock.price, stock.currency));
+                setTextById('ma20Value', stock.ma20 === 'N/A' ? 'N/A' : formatCurrency(stock.ma20, stock.currency));
+                setTextById('statusValue', stock.valuation_status || 'N/A');
+
+                const changeEl = setTextById('changeValue', stock.change ?? 'N/A');
+                if (changeEl) changeEl.className = `value ${getValueClass(stock.change)}`;
+
+                const percentEl = setTextById('percentValue', `${stock.percent ?? 'N/A'}%`);
+                if (percentEl) percentEl.className = `value ${getValueClass(stock.percent)}`;
+
+                const macdStatusEl = setTextById('macdStatusValue', stock.macd_status || 'N/A');
+                if (macdStatusEl) macdStatusEl.className = `value ${getSignalClass(stock.macd_status)}`;
+
+                updateBriefInsights(currentStockSnapshot);
+                renderChecklist(checklistItems);
+                renderLevelBadges('supportLevelsBox', supportLevels, 'support');
+                renderLevelBadges('resistanceLevelsBox', resistanceLevels, 'resistance');
+
+                const aiSummaryBox = document.getElementById('aiSummaryBox');
+                const aiSummaryEl = document.getElementById('aiSummary');
+                if (aiSummaryEl && currentStockSnapshot.ai_summary) {
+                    aiSummaryEl.textContent = currentStockSnapshot.ai_summary;
+                    if (aiSummaryBox) aiSummaryBox.style.display = 'block';
+                } else if (aiSummaryBox) {
+                    aiSummaryBox.style.display = 'none';
+                }
+
+                const displayPeriod = result.display_period || (result.selected_period || currentPeriod).toUpperCase();
+                setTextById('periodTitle', displayPeriod);
+                setTextById('periodTitleMacd', displayPeriod);
+                setTextById('periodTitleCandle', displayPeriod);
+                setTextById('periodTitleVolume', displayPeriod);
+                setTextById('periodTitleStoch', displayPeriod);
+                setTextById('modeBadge', result.is_intraday ? 'INTRADAY LIVE MODE' : 'STANDARD CHART MODE');
+                syncQuickIntervals();
+                refreshStrategistDesk(currentStockSnapshot);
+                syncPortfolioPrice(currentStockSnapshot);
+
+                const resolvedTextEl = document.getElementById('resolvedText');
+                if (resolvedTextEl) {
+                    if (stock.resolved_from && stock.resolved_from.toUpperCase() !== stock.symbol) {
+                        resolvedTextEl.style.display = 'block';
+                        resolvedTextEl.innerHTML = `Showing result for "<b>${stock.resolved_from}</b>" → ${stock.symbol}`;
+                    } else {
+                        resolvedTextEl.style.display = 'none';
+                    }
+                }
+
+                renderNews(result.news);
+                updateCharts(
+                    labels,
+                    priceData,
+                    volumeData,
+                    volumeColors,
+                    macdData,
+                    signalData,
+                    supportLevels,
+                    resistanceLevels,
+                    stochKData,
+                    stochDData
+                );
+                await updateCandlestickChart(candleData, supportLevels, resistanceLevels);
+            } catch (error) {
+                console.log('Live refresh error:', error);
+            }
+        }
+
         addRecentSearch(currentSymbol);
-        updateBriefInsights({
-            setup_score: {{ data.setup_score | tojson }},
-            setup_label: {{ data.setup_label | tojson }},
-            risk_level: {{ data.risk_level | tojson }},
-            risk_score: {{ data.risk_score | tojson }},
-            risk_score_label: {{ data.risk_score_label | tojson }},
-            risk_reason: {{ data.risk_reason | tojson }},
-            news_sentiment: {{ data.news_sentiment | tojson }},
-            signal: {{ data.signal | tojson }},
-            signal_reason: {{ data.signal_reason | tojson }},
-            avg_volume: {{ data.avg_volume | tojson }},
-            volume_vs_avg: {{ data.volume_vs_avg | tojson }},
-            week_52_low: {{ data.week_52_low | tojson }},
-            week_52_high: {{ data.week_52_high | tojson }},
-            price_position_52w: {{ data.price_position_52w | tojson }},
-            volume_trend: {{ data.volume_trend | tojson }},
-            beta: {{ data.beta | tojson }},
-            ema20: {{ data.ema20 | tojson }},
-            ema50: {{ data.ema50 | tojson }},
-            bb_position: {{ data.bb_position | tojson }},
-            bb_upper: {{ data.bb_upper | tojson }},
-            bb_lower: {{ data.bb_lower | tojson }},
-            atr: {{ data.atr | tojson }},
-            stoch_k: {{ data.stoch_k | tojson }},
-            stoch_d: {{ data.stoch_d | tojson }},
-            ai_summary: {{ ai_summary | tojson }},
-            symbol: {{ data.symbol | tojson }}
-        });
+        updateBriefInsights(currentStockSnapshot);
         renderChecklist(checklistItems);
         initCharts();
         populateBenchmarkSelect();

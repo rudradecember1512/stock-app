@@ -880,6 +880,179 @@ def safe_get_52_week_range(info, hist_6mo, current_price):
     )
 
 
+def format_large_number(value):
+    return format_market_cap(value) if isinstance(value, (int, float)) else "N/A"
+
+
+def format_percent_value(value):
+    return f"{round(float(value), 2)}%" if isinstance(value, (int, float)) else "N/A"
+
+
+def safe_get_total_shares(info, fast_info):
+    shares = (
+        info.get("sharesOutstanding")
+        or info.get("impliedSharesOutstanding")
+        or fast_info.get("shares")
+    )
+    return format_large_number(shares), shares if isinstance(shares, (int, float)) else None
+
+
+def safe_get_ratio(info, *keys):
+    for key in keys:
+        value = info.get(key)
+        if isinstance(value, (int, float)):
+            return round(float(value), 2)
+    return "N/A"
+
+
+def safe_get_table(fetcher):
+    try:
+        table = fetcher()
+        return table if isinstance(table, pd.DataFrame) else pd.DataFrame()
+    except Exception:
+        return pd.DataFrame()
+
+
+def get_statement_value(statement, labels, column_index=0):
+    if statement.empty:
+        return None
+
+    normalized_index = {str(idx).strip().lower(): idx for idx in statement.index}
+    for label in labels:
+        idx = normalized_index.get(str(label).strip().lower())
+        if idx is None:
+            continue
+        try:
+            value = statement.loc[idx].iloc[column_index]
+            return safe_float(value, None)
+        except Exception:
+            continue
+    return None
+
+
+def safe_get_valuation_snapshot(stock, info, fast_info):
+    enterprise_value_raw = info.get("enterpriseValue")
+    enterprise_value = format_large_number(enterprise_value_raw)
+    price_to_book = safe_get_ratio(info, "priceToBook")
+    peg_ratio = safe_get_ratio(info, "pegRatio")
+    dividend_yield_raw = info.get("dividendYield")
+    dividend_yield = format_percent_value(dividend_yield_raw * 100) if isinstance(dividend_yield_raw, (int, float)) else "N/A"
+    ev_to_ebitda = safe_get_ratio(info, "enterpriseToEbitda")
+    ev_to_sales = safe_get_ratio(info, "enterpriseToRevenue")
+
+    financials = safe_get_table(lambda: stock.quarterly_income_stmt)
+    balance_sheet = safe_get_table(lambda: stock.quarterly_balance_sheet)
+
+    latest_ebit = get_statement_value(financials, ["EBIT", "Operating Income", "Operating Revenue"])
+    latest_ebitda = get_statement_value(financials, ["EBITDA"])
+    latest_revenue = get_statement_value(financials, ["Total Revenue", "Operating Revenue", "Revenue"])
+    total_assets = get_statement_value(balance_sheet, ["Total Assets"])
+    current_liabilities = get_statement_value(balance_sheet, ["Current Liabilities", "Total Current Liabilities"])
+    stockholders_equity = get_statement_value(balance_sheet, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"])
+
+    capital_employed = None
+    if isinstance(total_assets, (int, float)) and isinstance(current_liabilities, (int, float)):
+        capital_employed = total_assets - current_liabilities
+
+    ev_to_ebit = round(enterprise_value_raw / (latest_ebit * 4), 2) if isinstance(enterprise_value_raw, (int, float)) and isinstance(latest_ebit, (int, float)) and latest_ebit not in (0, None) else "N/A"
+    ev_to_capital_employed = round(enterprise_value_raw / capital_employed, 2) if isinstance(enterprise_value_raw, (int, float)) and isinstance(capital_employed, (int, float)) and capital_employed not in (0, None) else "N/A"
+    ev_to_sales = round(enterprise_value_raw / (latest_revenue * 4), 2) if ev_to_sales == "N/A" and isinstance(enterprise_value_raw, (int, float)) and isinstance(latest_revenue, (int, float)) and latest_revenue not in (0, None) else ev_to_sales
+    ev_to_ebitda = round(enterprise_value_raw / (latest_ebitda * 4), 2) if ev_to_ebitda == "N/A" and isinstance(enterprise_value_raw, (int, float)) and isinstance(latest_ebitda, (int, float)) and latest_ebitda not in (0, None) else ev_to_ebitda
+
+    pe_ratio = safe_get_pe_ratio(info)
+    valuation_status = "Fairly Valued"
+    if isinstance(peg_ratio, (int, float)) and peg_ratio <= 1.2 and (pe_ratio == "N/A" or pe_ratio <= 25) and (price_to_book == "N/A" or price_to_book <= 4):
+        valuation_status = "Potentially Undervalued"
+    elif (isinstance(peg_ratio, (int, float)) and peg_ratio >= 2) or (isinstance(pe_ratio, (int, float)) and pe_ratio >= 40) or (isinstance(price_to_book, (int, float)) and price_to_book >= 8):
+        valuation_status = "Premium Valuation"
+
+    return {
+        "valuation": enterprise_value,
+        "valuation_status": valuation_status,
+        "price_to_book": price_to_book,
+        "ev_to_ebit": ev_to_ebit,
+        "ev_to_ebitda": ev_to_ebitda,
+        "ev_to_capital_employed": ev_to_capital_employed,
+        "ev_to_sales": ev_to_sales,
+        "peg_ratio": peg_ratio,
+        "dividend_yield": dividend_yield,
+        "stockholders_equity_raw": stockholders_equity
+    }
+
+
+def safe_get_profitability_snapshot(stock, info, shares_outstanding):
+    financials = safe_get_table(lambda: stock.quarterly_income_stmt)
+    balance_sheet = safe_get_table(lambda: stock.quarterly_balance_sheet)
+
+    latest_net_income = get_statement_value(financials, ["Net Income", "Net Income Common Stockholders"])
+    latest_ebit = get_statement_value(financials, ["EBIT", "Operating Income"])
+    latest_eps = get_statement_value(financials, ["Diluted EPS", "Basic EPS"])
+    if not isinstance(latest_eps, (int, float)):
+        latest_eps = info.get("trailingEps")
+
+    total_assets = get_statement_value(balance_sheet, ["Total Assets"])
+    current_liabilities = get_statement_value(balance_sheet, ["Current Liabilities", "Total Current Liabilities"])
+    stockholders_equity = get_statement_value(balance_sheet, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"])
+
+    capital_employed = None
+    if isinstance(total_assets, (int, float)) and isinstance(current_liabilities, (int, float)):
+        capital_employed = total_assets - current_liabilities
+
+    roe = round(((latest_net_income * 4) / stockholders_equity) * 100, 2) if isinstance(latest_net_income, (int, float)) and isinstance(stockholders_equity, (int, float)) and stockholders_equity not in (0, None) else "N/A"
+    roce = round(((latest_ebit * 4) / capital_employed) * 100, 2) if isinstance(latest_ebit, (int, float)) and isinstance(capital_employed, (int, float)) and capital_employed not in (0, None) else "N/A"
+    bvps = round(stockholders_equity / shares_outstanding, 2) if isinstance(stockholders_equity, (int, float)) and isinstance(shares_outstanding, (int, float)) and shares_outstanding not in (0, None) else "N/A"
+
+    return {
+        "roe_latest": roe,
+        "roce_latest": roce,
+        "bvps": bvps,
+        "latest_eps": round(float(latest_eps), 2) if isinstance(latest_eps, (int, float)) else "N/A"
+    }
+
+
+def safe_get_quarterly_snapshot(stock):
+    financials = safe_get_table(lambda: stock.quarterly_income_stmt)
+    if financials.empty:
+        return {
+            "q1_performance": "N/A",
+            "q2_performance": "N/A",
+            "q3_performance": "N/A",
+            "q4_performance": "N/A",
+            "qoq_performance": "N/A"
+        }
+
+    revenue_row = None
+    for label in ["Total Revenue", "Operating Revenue", "Revenue"]:
+        if label in financials.index:
+            revenue_row = financials.loc[label]
+            break
+
+    if revenue_row is None:
+        return {
+            "q1_performance": "N/A",
+            "q2_performance": "N/A",
+            "q3_performance": "N/A",
+            "q4_performance": "N/A",
+            "qoq_performance": "N/A"
+        }
+
+    ordered_values = [safe_float(value, None) for value in revenue_row.iloc[::-1].tolist() if pd.notna(value)]
+    last_four = ordered_values[-4:]
+
+    quarter_map = {
+        "q1_performance": format_large_number(last_four[0]) if len(last_four) > 0 else "N/A",
+        "q2_performance": format_large_number(last_four[1]) if len(last_four) > 1 else "N/A",
+        "q3_performance": format_large_number(last_four[2]) if len(last_four) > 2 else "N/A",
+        "q4_performance": format_large_number(last_four[3]) if len(last_four) > 3 else "N/A",
+        "qoq_performance": "N/A"
+    }
+
+    if len(last_four) >= 2 and isinstance(last_four[-1], (int, float)) and isinstance(last_four[-2], (int, float)) and last_four[-2] not in (0, None):
+        quarter_map["qoq_performance"] = f"{round(((last_four[-1] - last_four[-2]) / last_four[-2]) * 100, 2)}%"
+
+    return quarter_map
+
+
 def build_trade_setup(data, news):
     score = 50
 
@@ -1538,6 +1711,10 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
     beta = safe_get_beta(info)
     average_volume_raw = safe_get_average_volume(info, fast_info)
     week_low, week_high, price_position_52w = safe_get_52_week_range(info, hist_6mo, current_price)
+    total_shares, total_shares_raw = safe_get_total_shares(info, fast_info)
+    valuation_snapshot = safe_get_valuation_snapshot(stock, info, fast_info)
+    profitability_snapshot = safe_get_profitability_snapshot(stock, info, total_shares_raw)
+    quarterly_snapshot = safe_get_quarterly_snapshot(stock)
 
     signal = "Neutral"
     signal_reason = "Indicators are mixed"
@@ -1621,7 +1798,26 @@ def build_stock_payload(symbol, selected_period="6mo", original_input=None):
         "percent": round(percent_change, 2),
         "sector": safe_get_sector(info),
         "market_cap": market_cap,
+        "total_shares": total_shares,
+        "valuation": valuation_snapshot["valuation"],
+        "valuation_status": valuation_snapshot["valuation_status"],
         "pe_ratio": pe_ratio,
+        "price_to_book": valuation_snapshot["price_to_book"],
+        "ev_to_ebit": valuation_snapshot["ev_to_ebit"],
+        "ev_to_ebitda": valuation_snapshot["ev_to_ebitda"],
+        "ev_to_capital_employed": valuation_snapshot["ev_to_capital_employed"],
+        "ev_to_sales": valuation_snapshot["ev_to_sales"],
+        "peg_ratio": valuation_snapshot["peg_ratio"],
+        "dividend_yield": valuation_snapshot["dividend_yield"],
+        "roce_latest": profitability_snapshot["roce_latest"],
+        "roe_latest": profitability_snapshot["roe_latest"],
+        "bvps": profitability_snapshot["bvps"],
+        "latest_eps": profitability_snapshot["latest_eps"],
+        "q1_performance": quarterly_snapshot["q1_performance"],
+        "q2_performance": quarterly_snapshot["q2_performance"],
+        "q3_performance": quarterly_snapshot["q3_performance"],
+        "q4_performance": quarterly_snapshot["q4_performance"],
+        "qoq_performance": quarterly_snapshot["qoq_performance"],
         "currency": currency,
         "rsi": latest_rsi,
         "ma20": latest_ma20,
