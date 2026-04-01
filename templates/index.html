@@ -1141,6 +1141,82 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
+        .external-links-panel {
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+            padding: 18px;
+            margin: 0 0 18px;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .external-links-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .external-links-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .external-links-subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            max-width: 720px;
+        }
+
+        .external-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .external-link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: 0.2s ease;
+        }
+
+        .external-link-card:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(255, 255, 255, 0.05));
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .external-link-name {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .external-link-note {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .external-link-arrow {
+            color: #93c5fd;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
         .saved-list {
             display: flex;
             flex-wrap: wrap;
@@ -2884,6 +2960,52 @@
                     <button type="button" class="ghost-button" id="copySnapshotBtn">Copy Snapshot</button>
                 </div>
 
+                <div class="external-links-panel">
+                    <div class="external-links-head">
+                        <div>
+                            <div class="external-links-title">Detailed Analysis Elsewhere</div>
+                            <div class="external-links-subtitle">Open the current stock on other research platforms for deeper financials, charts, and market coverage.</div>
+                        </div>
+                    </div>
+                    <div class="external-links-grid" id="externalLinksGrid">
+                        <a class="external-link-card" id="externalTradingView" href="https://www.tradingview.com/symbols/NSE-{{ data.symbol | urlencode }}/" target="_blank" rel="noopener noreferrer">
+                            <div>
+                                <div class="external-link-name">TradingView</div>
+                                <div class="external-link-note">Advanced charting and indicators</div>
+                            </div>
+                            <span class="external-link-arrow">↗</span>
+                        </a>
+                        <a class="external-link-card" id="externalYahoo" href="https://finance.yahoo.com/quote/{{ data.symbol | urlencode }}.NS" target="_blank" rel="noopener noreferrer">
+                            <div>
+                                <div class="external-link-name">Yahoo Finance</div>
+                                <div class="external-link-note">Quote, profile, news, and stats</div>
+                            </div>
+                            <span class="external-link-arrow">↗</span>
+                        </a>
+                        <a class="external-link-card" id="externalScreener" href="https://www.screener.in/company/{{ data.symbol | urlencode }}/" target="_blank" rel="noopener noreferrer">
+                            <div>
+                                <div class="external-link-name">Screener</div>
+                                <div class="external-link-note">Financial statements and ratios</div>
+                            </div>
+                            <span class="external-link-arrow">↗</span>
+                        </a>
+                        <a class="external-link-card" id="externalMoneycontrol" href="https://www.google.com/search?q={{ (data.symbol ~ ' site:moneycontrol.com stock') | urlencode }}" target="_blank" rel="noopener noreferrer">
+                            <div>
+                                <div class="external-link-name">Moneycontrol</div>
+                                <div class="external-link-note">Broker views and stock coverage</div>
+                            </div>
+                            <span class="external-link-arrow">↗</span>
+                        </a>
+                        <a class="external-link-card" id="externalETMarkets" href="https://www.google.com/search?q={{ (data.symbol ~ ' site:economictimes.indiatimes.com/markets stock') | urlencode }}" target="_blank" rel="noopener noreferrer">
+                            <div>
+                                <div class="external-link-name">ET Markets</div>
+                                <div class="external-link-note">Market news and company updates</div>
+                            </div>
+                            <span class="external-link-arrow">↗</span>
+                        </a>
+                    </div>
+                </div>
+
                 <div class="feature-ribbon">
                     <div class="feature-card">
                         <div class="feature-label">Sector</div>
@@ -4285,6 +4407,28 @@
             return element;
         }
 
+        function updateExternalLinks(symbol) {
+            const cleaned = String(symbol || '').trim().toUpperCase();
+            if (!cleaned) return;
+
+            const encoded = encodeURIComponent(cleaned);
+            const googleMoneycontrol = encodeURIComponent(`${cleaned} site:moneycontrol.com stock`);
+            const googleET = encodeURIComponent(`${cleaned} site:economictimes.indiatimes.com/markets stock`);
+
+            const linkMap = {
+                externalTradingView: `https://www.tradingview.com/symbols/NSE-${encoded}/`,
+                externalYahoo: `https://finance.yahoo.com/quote/${encoded}.NS`,
+                externalScreener: `https://www.screener.in/company/${encoded}/`,
+                externalMoneycontrol: `https://www.google.com/search?q=${googleMoneycontrol}`,
+                externalETMarkets: `https://www.google.com/search?q=${googleET}`
+            };
+
+            Object.entries(linkMap).forEach(([id, href]) => {
+                const link = document.getElementById(id);
+                if (link) link.href = href;
+            });
+        }
+
         function updateVerdictSummary(stock) {
             const summaryStockTitle = document.getElementById('summaryStockTitle');
             const summaryTickerValue = document.getElementById('summaryTickerValue');
@@ -4311,6 +4455,7 @@
             }
             summaryVerdictPill.textContent = valuation.text;
             summaryVerdictPill.className = `verdict-pill ${valuation.pillClass}`;
+            updateExternalLinks(stock.symbol);
         }
 
         function updateBriefInsights(stock) {
