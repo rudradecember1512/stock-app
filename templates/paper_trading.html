@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Trading | Stock Analyzer Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root {
+            --bg: #f3f6fb;
+            --panel: rgba(255, 255, 255, 0.96);
+            --border: rgba(96, 112, 139, 0.18);
+            --text: #172033;
+            --muted: #67758f;
+            --primary: #2457ff;
+            --green: #0b9a6b;
+            --red: #e04f5f;
+            --shadow: 0 20px 45px rgba(20, 30, 48, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(36, 87, 255, 0.12), transparent 26%),
+                linear-gradient(180deg, #f7f9fd 0%, #eef2f8 100%);
+        }
+
+        .page { max-width: 1480px; margin: 0 auto; padding: 18px; }
+        .topbar, .panel, .auth-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar {
+            border-radius: 22px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2457ff, #4ec2ff);
+        }
+
+        h1, h2, h3 { margin: 0; font-family: "Sora", Arial, sans-serif; }
+        .subcopy { color: var(--muted); font-size: 13px; line-height: 1.7; }
+        .top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        button, input { font: inherit; }
+        button { border: 0; cursor: pointer; }
+
+        .ghost-btn, .secondary-btn, .buy-btn, .sell-btn, .primary-btn {
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-weight: 800;
+        }
+
+        .ghost-btn, .secondary-btn {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #2457ff, #4e79ff);
+            color: white;
+        }
+
+        .buy-btn {
+            background: rgba(11, 154, 107, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(11, 154, 107, 0.18);
+        }
+
+        .sell-btn {
+            background: rgba(224, 79, 95, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(224, 79, 95, 0.18);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px minmax(0, 1fr) 360px;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .panel { border-radius: 22px; overflow: hidden; }
+        .panel-head {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-body { padding: 16px 18px; }
+        .stack { display: grid; gap: 12px; }
+
+        .watch-search, .trade-form input, .auth-form input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #f8faff;
+            color: var(--text);
+            outline: none;
+        }
+
+        .watch-item, .metric-card, .summary-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px;
+            background: white;
+        }
+
+        .watch-item { cursor: pointer; }
+        .watch-item.active {
+            border-color: rgba(36, 87, 255, 0.28);
+            background: rgba(36, 87, 255, 0.05);
+        }
+
+        .watch-row, .auth-tabs, .flash {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-hero {
+            padding: 18px;
+            border-bottom: 1px solid var(--border);
+            background:
+                radial-gradient(circle at top right, rgba(36, 87, 255, 0.12), transparent 28%),
+                linear-gradient(180deg, #ffffff, #fbfcff);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .symbol-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-family: "Sora", Arial, sans-serif;
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+        }
+
+        .mini-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .metric-card .label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 800;
+        }
+
+        .metric-card strong {
+            display: block;
+            margin-top: 6px;
+            font-size: 20px;
+        }
+
+        #chartWrap { height: 470px; }
+        .toolbar {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .toolbar-group button.active {
+            background: rgba(36, 87, 255, 0.1);
+            color: var(--primary);
+            border-color: rgba(36, 87, 255, 0.2);
+        }
+
+        .trade-form { display: grid; gap: 12px; }
+        .trade-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .summary-list, .suggestions, .options-grid, .modal-actions { display: grid; gap: 10px; }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .summary-item span { color: var(--muted); }
+        .table-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: white;
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f7;
+            font-size: 13px;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        tr:last-child td { border-bottom: 0; }
+        .positive { color: var(--green); }
+        .negative { color: var(--red); }
+        .neutral { color: var(--text); }
+        .empty {
+            padding: 18px;
+            border: 1px dashed var(--border);
+            border-radius: 18px;
+            color: var(--muted);
+            line-height: 1.7;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .flash {
+            position: sticky;
+            top: 14px;
+            z-index: 10;
+            margin-bottom: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: white;
+            display: none;
+        }
+
+        .flash.show { display: flex; }
+        .flash.success { color: var(--green); border-color: rgba(11, 154, 107, 0.2); }
+        .flash.error { color: var(--red); border-color: rgba(224, 79, 95, 0.2); }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 29, 0.72);
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            z-index: 40;
+        }
+
+        .modal.hidden { display: none; }
+        .auth-card {
+            width: min(460px, 100%);
+            border-radius: 30px;
+            padding: 28px;
+            background:
+                radial-gradient(circle at top right, rgba(78, 194, 255, 0.14), transparent 28%),
+                linear-gradient(145deg, rgba(12, 18, 31, 0.98), rgba(10, 14, 24, 0.98));
+            color: white;
+        }
+
+        .auth-tabs button {
+            flex: 1;
+            border-radius: 14px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .auth-tabs button.active {
+            background: white;
+            color: var(--text);
+        }
+
+        .auth-form { margin-top: 18px; display: grid; gap: 12px; }
+        .auth-form input { background: rgba(255, 255, 255, 0.96); }
+
+        .suggestion {
+            width: 100%;
+            text-align: left;
+            padding: 11px 12px;
+            border-radius: 14px;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #f8faff;
+            color: var(--text);
+            outline: none;
+            font: inherit;
+        }
+
+        .options-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .chart-trade-card {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 12px 14px;
+            box-shadow: var(--shadow);
+            min-width: 240px;
+        }
+
+        .chart-box {
+            position: relative;
+        }
+
+        .trade-modal-card {
+            width: min(420px, 100%);
+            border-radius: 26px;
+            padding: 24px;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .modal-actions {
+            grid-template-columns: 1fr 1fr;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 1180px) {
+            .layout { grid-template-columns: 1fr; }
+            .hero-grid, .trade-grid, .mini-metrics { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div id="flashBox" class="flash"></div>
+
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-badge">PT</div>
+                <div>
+                    <h1>Paper Trading Platform</h1>
+                    <div class="subcopy">Login, virtual wallet, real-time quote based buy/sell, holdings, and trade history in one terminal.</div>
+                </div>
+            </div>
+            <div class="top-actions">
+                <div class="pill" id="authStatus">Guest Mode</div>
+                <a class="ghost-btn" href="/">Dashboard</a>
+                <button class="ghost-btn" id="resetButton" type="button">Reset Account</button>
+                <button class="ghost-btn" id="logoutButton" type="button">Logout</button>
+            </div>
+        </header>
+
+        <section class="layout">
+            <aside class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Watchlist</h3>
+                        <div class="subcopy">Quick select for active paper trading symbols</div>
+                    </div>
+                </div>
+                <div class="panel-body stack">
+                    <div>
+                        <input class="watch-search" id="stockSearch" type="text" placeholder="Search stock like RELIANCE, TCS, AAPL">
+                        <div class="suggestions" id="suggestions"></div>
+                    </div>
+                    <div id="watchlist" class="stack"></div>
+                </div>
+            </aside>
+
+            <main class="panel">
+                <div class="chart-hero">
+                    <div class="hero-grid">
+                        <div>
+                            <div class="symbol-line">
+                                <h2 id="selectedName">RELIANCE</h2>
+                                <span class="pill" id="selectedSymbol">RELIANCE.NS</span>
+                            </div>
+                            <div class="price" id="currentPrice">Rs 0.00</div>
+                            <div class="subcopy" id="priceMeta">Waiting for live market snapshot...</div>
+                        </div>
+                        <div class="mini-metrics">
+                            <div class="metric-card">
+                                <div class="label">Selected Holding</div>
+                                <strong id="selectedHoldingQty">0</strong>
+                                <div class="subcopy">Shares available to sell</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Avg Buy Price</div>
+                                <strong id="selectedHoldingAvg">Rs 0.00</strong>
+                                <div class="subcopy">Current user position cost</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Trade Estimate</div>
+                                <strong id="tradeEstimate">Rs 0.00</strong>
+                                <div class="subcopy">Quantity multiplied by live price</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <button class="secondary-btn period-btn active" data-period="1min" type="button">1m</button>
+                        <button class="secondary-btn period-btn" data-period="5min" type="button">5m</button>
+                        <button class="secondary-btn period-btn" data-period="15min" type="button">15m</button>
+                        <button class="secondary-btn period-btn" data-period="1d" type="button">1D</button>
+                        <button class="secondary-btn period-btn" data-period="6mo" type="button">6M</button>
+                    </div>
+                    <div class="subcopy" id="chartStatus">Loading chart...</div>
+                </div>
+                <div class="chart-box">
+                    <div id="chartWrap"></div>
+                    <div class="chart-trade-card">
+                        <div class="summary-item"><span>Chart Price</span><strong id="chartClickedPrice">Tap candle to select</strong></div>
+                        <div class="summary-item"><span>Action</span><button class="secondary-btn" id="openChartTradeButton" type="button">Trade from Chart</button></div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="stack">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h3>Trade Ticket</h3>
+                            <div class="subcopy">Search or select a stock, enter quantity, then buy or sell</div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="trade-form">
+                            <div class="trade-grid">
+                                <div>
+                                    <div class="subcopy">Stock</div>
+                                    <input id="tradeSymbol" type="text" readonly>
+                                </div>
+                                <div>
+                                    <div class="subcopy">Quantity</div>
+                                    <input id="quantityInput" type="number" min="1" value="1">
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-item"><span>Live Price</span><strong id="ticketPrice">Rs 0.00</strong></div>
+                                <div class="summary-item"><span>Estimated Value</span><strong id="ticketValue">Rs 0.00</strong></div>
+                                <div class="summary-item"><span>Wallet Balance</span><strong id="ticketBalance">Rs 0.00</strong></div>
+                            </div>
+                            <div class="trade-grid">
+                                <button class="buy-btn" id="buyButton" type="button">Buy</button>
+                                <button class="sell-btn" id="sellButton" type="button">Sell</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h3>Paper Wallet</h3>
+                            <div class="subcopy">Every new account starts with Rs 1,00,000</div>
+                        </div>
+                    </div>
+                    <div class="panel-body summary-list" id="walletSummary"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h3>Index Options</h3>
+                            <div class="subcopy">NIFTY and BANKNIFTY simulated CE/PE paper trading</div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="trade-form">
+                            <div class="options-grid">
+                                <div>
+                                    <div class="subcopy">Underlying</div>
+                                    <select id="optionUnderlying">
+                                        <option value="NIFTY">NIFTY</option>
+                                        <option value="BANKNIFTY">BANKNIFTY</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="subcopy">Expiry</div>
+                                    <select id="optionExpiry"></select>
+                                </div>
+                                <div>
+                                    <div class="subcopy">Option Type</div>
+                                    <select id="optionType">
+                                        <option value="CE">CE</option>
+                                        <option value="PE">PE</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="subcopy">Strike</div>
+                                    <select id="optionStrike"></select>
+                                </div>
+                                <div>
+                                    <div class="subcopy">Lots</div>
+                                    <input id="optionLots" type="number" min="1" value="1">
+                                </div>
+                                <div>
+                                    <div class="subcopy">Premium</div>
+                                    <input id="optionPremium" type="number" min="0" step="0.05">
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-item"><span>Spot</span><strong id="optionSpot">Rs 0.00</strong></div>
+                                <div class="summary-item"><span>Lot Size</span><strong id="optionLotSize">0</strong></div>
+                                <div class="summary-item"><span>Estimated Value</span><strong id="optionEstimate">Rs 0.00</strong></div>
+                            </div>
+                            <div class="trade-grid">
+                                <button class="buy-btn" id="buyOptionButton" type="button">Buy Option</button>
+                                <button class="sell-btn" id="sellOptionButton" type="button">Sell Option</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </section>
+
+        <section class="layout" style="margin-top: 14px; grid-template-columns: 1fr 1fr 1fr;">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Holdings</h3>
+                        <div class="subcopy">Stocks bought by the logged in user</div>
+                    </div>
+                </div>
+                <div class="panel-body" id="holdingsWrap"></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Recent Trades</h3>
+                        <div class="subcopy">Latest buy and sell activity</div>
+                    </div>
+                </div>
+                <div class="panel-body" id="tradesWrap"></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Option Positions</h3>
+                        <div class="subcopy">Open option positions and option trade tape</div>
+                    </div>
+                </div>
+                <div class="panel-body stack">
+                    <div id="optionsWrap"></div>
+                    <div id="optionTradesWrap"></div>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <div class="modal" id="authModal">
+        <div class="auth-card">
+            <div class="subcopy" style="color: rgba(255,255,255,0.72); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800;">Paper Trading Access</div>
+            <h2 style="margin-top: 10px;">Create account or log in to start trading.</h2>
+            <p class="subcopy" style="color: rgba(255,255,255,0.75); margin-top: 10px;">Your paper wallet, holdings, and trades are now stored on the backend instead of browser local storage.</p>
+
+            <div class="auth-tabs" style="margin-top: 18px;">
+                <button type="button" class="active" data-auth-tab="login">Login</button>
+                <button type="button" data-auth-tab="signup">Signup</button>
+            </div>
+
+            <form class="auth-form" id="authForm">
+                <input id="authUsername" type="text" placeholder="Username" required>
+                <input id="authPassword" type="password" placeholder="Password" required>
+                <button class="primary-btn" id="authSubmitButton" type="submit">Login to Paper Wallet</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="chartTradeModal">
+        <div class="trade-modal-card">
+            <h3>Trade from Chart</h3>
+            <p class="subcopy" id="chartTradeInfo">Selected price will be used for paper execution.</p>
+            <div class="trade-form">
+                <input id="chartTradeSymbol" type="text" readonly>
+                <input id="chartTradePrice" type="number" min="0" step="0.01">
+                <input id="chartTradeQty" type="number" min="1" value="1">
+            </div>
+            <div class="modal-actions">
+                <button class="buy-btn" id="chartModalBuyButton" type="button">Buy</button>
+                <button class="sell-btn" id="chartModalSellButton" type="button">Sell</button>
+                <button class="ghost-btn" id="closeChartTradeButton" type="button" style="grid-column: 1 / -1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WATCHLIST = [
+            { name: "RELIANCE", symbol: "RELIANCE.NS" },
+            { name: "TCS", symbol: "TCS.NS" },
+            { name: "INFY", symbol: "INFY.NS" },
+            { name: "SBIN", symbol: "SBIN.NS" },
+            { name: "AAPL", symbol: "AAPL" },
+            { name: "MSFT", symbol: "MSFT" }
+        ];
+
+        const state = {
+            authMode: "login",
+            authenticated: false,
+            portfolio: null,
+            options: null,
+            optionChain: null,
+            liveData: null,
+            selectedSymbol: "RELIANCE.NS",
+            selectedName: "RELIANCE",
+            selectedPeriod: "1min",
+            chartSelectedPrice: null,
+            chart: null,
+            quotes: {}
+        };
+
+        const flashBox = document.getElementById("flashBox");
+        const authModal = document.getElementById("authModal");
+        const authStatus = document.getElementById("authStatus");
+        const stockSearch = document.getElementById("stockSearch");
+        const suggestions = document.getElementById("suggestions");
+        const tradeSymbol = document.getElementById("tradeSymbol");
+        const quantityInput = document.getElementById("quantityInput");
+        const optionUnderlying = document.getElementById("optionUnderlying");
+        const optionExpiry = document.getElementById("optionExpiry");
+        const optionType = document.getElementById("optionType");
+        const optionStrike = document.getElementById("optionStrike");
+        const optionLots = document.getElementById("optionLots");
+        const optionPremium = document.getElementById("optionPremium");
+
+        function formatCurrency(value) {
+            return `Rs ${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function formatSigned(value) {
+            const amount = Number(value || 0);
+            return `${amount > 0 ? "+" : ""}${formatCurrency(amount)}`;
+        }
+
+        function getValueClass(value) {
+            const amount = Number(value || 0);
+            if (amount > 0) return "positive";
+            if (amount < 0) return "negative";
+            return "neutral";
+        }
+
+        function showFlash(message, type = "success") {
+            flashBox.textContent = message;
+            flashBox.className = `flash show ${type}`;
+            clearTimeout(showFlash.timer);
+            showFlash.timer = setTimeout(() => {
+                flashBox.className = "flash";
+            }, 2800);
+        }
+
+        async function fetchJson(url, options = {}) {
+            const response = await fetch(url, {
+                headers: { "Content-Type": "application/json" },
+                ...options
+            });
+            const data = await response.json();
+            if (!response.ok || data.success === false) {
+                throw new Error(data.error || data.error_message || "Request failed.");
+            }
+            return data;
+        }
+
+        function getSelectedHolding() {
+            if (!state.portfolio?.holdings) return null;
+            return state.portfolio.holdings.find(item => item.symbol === state.selectedSymbol) || null;
+        }
+
+        function updateSelectedHoldingCard() {
+            const holding = getSelectedHolding();
+            document.getElementById("selectedHoldingQty").textContent = holding ? holding.quantity.toLocaleString("en-IN") : "0";
+            document.getElementById("selectedHoldingAvg").textContent = holding ? formatCurrency(holding.average_price) : "Rs 0.00";
+        }
+
+        function updateTradeEstimate() {
+            const quantity = Math.max(1, Number(quantityInput.value || 1));
+            const price = Number(state.liveData?.data?.price || 0);
+            const estimate = price * quantity;
+            document.getElementById("tradeEstimate").textContent = formatCurrency(estimate);
+            document.getElementById("ticketPrice").textContent = formatCurrency(price);
+            document.getElementById("ticketValue").textContent = formatCurrency(estimate);
+            document.getElementById("tradeSymbol").value = state.selectedSymbol;
+        }
+
+        function renderWallet() {
+            const wallet = state.portfolio?.wallet;
+            const wrap = document.getElementById("walletSummary");
+            const balance = wallet?.balance || 0;
+            document.getElementById("ticketBalance").textContent = formatCurrency(balance);
+
+            if (!wallet) {
+                wrap.innerHTML = `<div class="empty">Login karke wallet summary yahan dikh jayegi.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = `
+                <div class="summary-item"><span>Starting Capital</span><strong>${formatCurrency(wallet.starting_balance)}</strong></div>
+                <div class="summary-item"><span>Cash Balance</span><strong>${formatCurrency(wallet.balance)}</strong></div>
+                <div class="summary-item"><span>Holdings Value</span><strong>${formatCurrency(wallet.holdings_value)}</strong></div>
+                <div class="summary-item"><span>Total Equity</span><strong>${formatCurrency(wallet.total_equity)}</strong></div>
+                <div class="summary-item"><span>Realized P&amp;L</span><strong class="${getValueClass(wallet.realized_pnl)}">${formatSigned(wallet.realized_pnl)}</strong></div>
+                <div class="summary-item"><span>Unrealized P&amp;L</span><strong class="${getValueClass(wallet.unrealized_pnl)}">${formatSigned(wallet.unrealized_pnl)}</strong></div>
+            `;
+        }
+
+        function renderHoldings() {
+            const holdings = state.portfolio?.holdings || [];
+            const wrap = document.getElementById("holdingsWrap");
+
+            if (!holdings.length) {
+                wrap.innerHTML = `<div class="empty">Abhi koi holdings nahi hain. Buy order place karoge to yahan quantity, average price, aur P&amp;L dikhega.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = `
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Qty</th>
+                                <th>Avg Price</th>
+                                <th>LTP</th>
+                                <th>Value</th>
+                                <th>P&amp;L</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${holdings.map(item => `
+                                <tr>
+                                    <td><strong>${item.company_name}</strong><br><span class="subcopy">${item.symbol}</span></td>
+                                    <td>${item.quantity.toLocaleString("en-IN")}</td>
+                                    <td>${formatCurrency(item.average_price)}</td>
+                                    <td>${formatCurrency(item.current_price)}</td>
+                                    <td>${formatCurrency(item.market_value)}</td>
+                                    <td class="${getValueClass(item.pnl)}">${formatSigned(item.pnl)}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderTrades() {
+            const trades = state.portfolio?.trades || [];
+            const wrap = document.getElementById("tradesWrap");
+
+            if (!trades.length) {
+                wrap.innerHTML = `<div class="empty">Trade history abhi empty hai. Buy ya sell karne ke baad backend trade tape yahan fill hoga.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = `
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Stock</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${trades.map(item => `
+                                <tr>
+                                    <td>${new Date(item.created_at).toLocaleString("en-IN")}</td>
+                                    <td class="${item.type === "BUY" ? "positive" : "negative"}">${item.type}</td>
+                                    <td><strong>${item.company_name}</strong><br><span class="subcopy">${item.symbol}</span></td>
+                                    <td>${item.quantity.toLocaleString("en-IN")}</td>
+                                    <td>${formatCurrency(item.price)}</td>
+                                    <td>${formatCurrency(item.total)}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderOptions() {
+            const options = state.options?.positions || [];
+            const trades = state.options?.trades || [];
+            const wrap = document.getElementById("optionsWrap");
+            const tradeWrap = document.getElementById("optionTradesWrap");
+
+            if (!options.length) {
+                wrap.innerHTML = `<div class="empty">Abhi koi open option position nahi hai.</div>`;
+            } else {
+                wrap.innerHTML = `
+                    <div class="table-card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Contract</th>
+                                    <th>Qty</th>
+                                    <th>Avg</th>
+                                    <th>LTP</th>
+                                    <th>P&amp;L</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${options.map(item => `
+                                    <tr>
+                                        <td><strong>${item.contract_symbol}</strong><br><span class="subcopy">${item.expiry}</span></td>
+                                        <td>${item.quantity}</td>
+                                        <td>${formatCurrency(item.average_price)}</td>
+                                        <td>${formatCurrency(item.current_price)}</td>
+                                        <td class="${getValueClass(item.pnl)}">${formatSigned(item.pnl)}</td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (!trades.length) {
+                tradeWrap.innerHTML = `<div class="empty">Option trade history yahan dikh jayegi.</div>`;
+            } else {
+                tradeWrap.innerHTML = `
+                    <div class="table-card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Contract</th>
+                                    <th>Qty</th>
+                                    <th>Premium</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${trades.map(item => `
+                                    <tr>
+                                        <td>${new Date(item.created_at).toLocaleString("en-IN")}</td>
+                                        <td class="${item.type === "BUY" ? "positive" : "negative"}">${item.type}</td>
+                                        <td>${item.contract_symbol}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${formatCurrency(item.price)}</td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+
+        function renderWatchlist() {
+            const wrap = document.getElementById("watchlist");
+            wrap.innerHTML = WATCHLIST.map(item => {
+                const quote = state.quotes[item.symbol];
+                const price = quote?.data?.price || 0;
+                const change = quote?.data?.change || 0;
+                const percent = quote?.data?.percent || 0;
+                return `
+                    <div class="watch-item ${state.selectedSymbol === item.symbol ? "active" : ""}" data-symbol="${item.symbol}" data-name="${item.name}">
+                        <div class="watch-row">
+                            <div>
+                                <strong>${item.name}</strong>
+                                <div class="subcopy">${item.symbol}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <strong>${formatCurrency(price)}</strong>
+                                <div class="${getValueClass(change)}" style="font-size:12px; margin-top:4px;">${change >= 0 ? "+" : ""}${Number(change).toFixed(2)} (${Number(percent).toFixed(2)}%)</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            wrap.querySelectorAll(".watch-item").forEach(item => {
+                item.addEventListener("click", async () => {
+                    await selectSymbol(item.dataset.symbol, item.dataset.name);
+                });
+            });
+        }
+
+        function updateChartTradeDisplay() {
+            const value = state.chartSelectedPrice ? formatCurrency(state.chartSelectedPrice) : "Tap candle to select";
+            document.getElementById("chartClickedPrice").textContent = value;
+            document.getElementById("chartTradePrice").value = state.chartSelectedPrice || "";
+            document.getElementById("chartTradeSymbol").value = state.selectedSymbol;
+            document.getElementById("chartTradeInfo").textContent = `${state.selectedName} selected price will be used for paper execution.`;
+        }
+
+        function populateOptionControls() {
+            const chain = state.optionChain;
+            if (!chain) return;
+            optionExpiry.innerHTML = chain.expiries.map(item => `<option value="${item}">${item}</option>`).join("");
+            optionStrike.innerHTML = chain.chain.map(item => `<option value="${item.strike}">${item.strike}</option>`).join("");
+            document.getElementById("optionSpot").textContent = formatCurrency(chain.spot);
+            document.getElementById("optionLotSize").textContent = chain.lot_size.toLocaleString("en-IN");
+            syncOptionPremium();
+        }
+
+        function syncOptionPremium() {
+            if (!state.optionChain) return;
+            const strike = Number(optionStrike.value || 0);
+            const row = state.optionChain.chain.find(item => item.strike === strike) || state.optionChain.chain[0];
+            const premium = optionType.value === "CE" ? row.ce_price : row.pe_price;
+            optionPremium.value = premium;
+            const totalQty = Number(optionLots.value || 1) * Number(state.optionChain.lot_size || 1);
+            document.getElementById("optionEstimate").textContent = formatCurrency(totalQty * Number(optionPremium.value || 0));
+        }
+
+        async function loadOptionChain() {
+            const result = await fetchJson(`/api/options/chain?underlying=${encodeURIComponent(optionUnderlying.value)}`);
+            state.optionChain = result.chain;
+            populateOptionControls();
+        }
+
+        async function submitOptionTrade(type) {
+            if (!state.authenticated) {
+                authModal.classList.remove("hidden");
+                showFlash("Options trade karne ke liye login kariye.", "error");
+                return;
+            }
+            try {
+                const qty = Number(optionLots.value || 1) * Number(state.optionChain.lot_size || 1);
+                const result = await fetchJson("/api/options/trade", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        underlying: optionUnderlying.value,
+                        expiry: optionExpiry.value,
+                        option_type: optionType.value,
+                        strike_price: Number(optionStrike.value),
+                        quantity: qty,
+                        price: Number(optionPremium.value || 0),
+                        type
+                    })
+                });
+                state.portfolio = result.portfolio;
+                state.options = result.options;
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                showFlash(result.message);
+            } catch (error) {
+                showFlash(error.message, "error");
+            }
+        }
+
+        function renderChart(result) {
+            const candleData = result?.candle_data || [];
+            const chartNode = document.querySelector("#chartWrap");
+            const options = {
+                chart: {
+                    type: "candlestick",
+                    height: 470,
+                    toolbar: { show: false },
+                    background: "transparent",
+                    animations: { enabled: false },
+                    events: {
+                        dataPointSelection: function(event, chartContext, config) {
+                            const point = candleData[config.dataPointIndex];
+                            const closeValue = point?.y?.[3];
+                            if (!closeValue) return;
+                            state.chartSelectedPrice = Number(closeValue);
+                            updateChartTradeDisplay();
+                            document.getElementById("chartTradeModal").classList.remove("hidden");
+                        }
+                    }
+                },
+                series: [{ data: candleData }],
+                theme: { mode: "light" },
+                xaxis: {
+                    type: "category",
+                    labels: { style: { colors: "#67758f" } }
+                },
+                yaxis: {
+                    opposite: true,
+                    labels: {
+                        style: { colors: "#67758f" },
+                        formatter: value => Number(value).toFixed(2)
+                    }
+                },
+                grid: { borderColor: "#edf1f7" },
+                plotOptions: {
+                    candlestick: {
+                        colors: {
+                            upward: "#0b9a6b",
+                            downward: "#e04f5f"
+                        }
+                    }
+                }
+            };
+
+            if (!state.chart) {
+                state.chart = new ApexCharts(chartNode, options);
+                state.chart.render();
+                return;
+            }
+
+            state.chart.updateOptions(options, true, true);
+        }
+
+        async function loadChartAndQuote() {
+            const result = await fetchJson(`/live-data/${encodeURIComponent(state.selectedSymbol)}?period=${state.selectedPeriod}`);
+            state.liveData = result;
+            state.selectedName = result.data.name || state.selectedName;
+
+            document.getElementById("selectedName").textContent = state.selectedName;
+            document.getElementById("selectedSymbol").textContent = state.liveData.data.symbol;
+            document.getElementById("currentPrice").textContent = formatCurrency(state.liveData.data.price);
+            document.getElementById("priceMeta").innerHTML = `<span class="${getValueClass(state.liveData.data.change)}">${state.liveData.data.change >= 0 ? "+" : ""}${Number(state.liveData.data.change).toFixed(2)} (${Number(state.liveData.data.percent).toFixed(2)}%)</span> from latest available session close`;
+            document.getElementById("chartStatus").textContent = `${state.liveData.data.name} | ${state.liveData.data.symbol} | ${result.data.display_period}`;
+            state.selectedSymbol = state.liveData.data.symbol;
+            state.chartSelectedPrice = Number(state.liveData.data.price || 0);
+            tradeSymbol.value = state.selectedSymbol;
+
+            renderChart(result);
+            updateSelectedHoldingCard();
+            updateTradeEstimate();
+            updateChartTradeDisplay();
+            renderWatchlist();
+        }
+
+        async function loadPortfolio() {
+            if (!state.authenticated) {
+                state.portfolio = null;
+                state.options = null;
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                return;
+            }
+
+            const result = await fetchJson("/api/paper/account");
+            state.portfolio = result.portfolio;
+            state.options = result.options;
+            authStatus.textContent = state.portfolio.user.username;
+            renderWallet();
+            renderHoldings();
+            renderTrades();
+            renderOptions();
+            updateSelectedHoldingCard();
+            updateTradeEstimate();
+        }
+
+        async function refreshWatchlistQuotes() {
+            await Promise.all(WATCHLIST.map(async item => {
+                try {
+                    state.quotes[item.symbol] = await fetchJson(`/live-data/${encodeURIComponent(item.symbol)}?period=1d`);
+                } catch (error) {
+                    state.quotes[item.symbol] = {
+                        data: { price: 0, change: 0, percent: 0 }
+                    };
+                }
+            }));
+            renderWatchlist();
+        }
+
+        async function selectSymbol(symbol, name) {
+            state.selectedSymbol = symbol;
+            state.selectedName = name;
+            stockSearch.value = `${name} (${symbol})`;
+            suggestions.innerHTML = "";
+            await loadChartAndQuote();
+        }
+
+        async function submitTrade(type) {
+            if (!state.authenticated) {
+                authModal.classList.remove("hidden");
+                showFlash("Trade karne ke liye login ya signup kariye.", "error");
+                return;
+            }
+
+            const quantity = Math.max(1, Number(quantityInput.value || 1));
+            try {
+                const result = await fetchJson("/api/paper/trade", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        type,
+                        symbol: state.selectedSymbol,
+                        quantity,
+                        price: state.chartSelectedPrice || undefined
+                    })
+                });
+                state.portfolio = result.portfolio;
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                updateTradeEstimate();
+                showFlash(result.message);
+            } catch (error) {
+                showFlash(error.message, "error");
+            }
+        }
+
+        async function handleAuthSubmit(event) {
+            event.preventDefault();
+            const username = document.getElementById("authUsername").value.trim();
+            const password = document.getElementById("authPassword").value.trim();
+            if (!username || !password) return;
+
+            const endpoint = state.authMode === "signup" ? "/api/auth/signup" : "/api/auth/login";
+            try {
+                const result = await fetchJson(endpoint, {
+                    method: "POST",
+                    body: JSON.stringify({ username, password })
+                });
+                state.authenticated = true;
+                state.portfolio = result.portfolio;
+                state.options = result.options || { positions: [], trades: [], summary: {} };
+                authModal.classList.add("hidden");
+                authStatus.textContent = state.portfolio.user.username;
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                updateTradeEstimate();
+                showFlash(result.message);
+            } catch (error) {
+                showFlash(error.message, "error");
+            }
+        }
+
+        async function checkAuth() {
+            const result = await fetchJson("/api/auth/status");
+            state.authenticated = result.authenticated;
+            if (state.authenticated) {
+                authModal.classList.add("hidden");
+                authStatus.textContent = result.user.username;
+                await loadPortfolio();
+            } else {
+                authModal.classList.remove("hidden");
+                authStatus.textContent = "Guest Mode";
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetchJson("/api/auth/logout", { method: "POST" });
+                state.authenticated = false;
+                state.portfolio = null;
+                state.options = null;
+                authStatus.textContent = "Guest Mode";
+                authModal.classList.remove("hidden");
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                showFlash("Logged out successfully.");
+            } catch (error) {
+                showFlash(error.message, "error");
+            }
+        }
+
+        async function resetAccount() {
+            if (!state.authenticated) {
+                showFlash("Reset karne se pehle login kariye.", "error");
+                return;
+            }
+            try {
+                const result = await fetchJson("/api/paper/reset", { method: "POST" });
+                state.portfolio = result.portfolio;
+                state.options = result.options;
+                renderWallet();
+                renderHoldings();
+                renderTrades();
+                renderOptions();
+                updateSelectedHoldingCard();
+                updateTradeEstimate();
+                showFlash(result.message);
+            } catch (error) {
+                showFlash(error.message, "error");
+            }
+        }
+
+        function setupAuthTabs() {
+            document.querySelectorAll("[data-auth-tab]").forEach(button => {
+                button.addEventListener("click", () => {
+                    state.authMode = button.dataset.authTab;
+                    document.querySelectorAll("[data-auth-tab]").forEach(item => item.classList.toggle("active", item === button));
+                    document.getElementById("authSubmitButton").textContent = state.authMode === "signup" ? "Create Paper Wallet" : "Login to Paper Wallet";
+                });
+            });
+        }
+
+        function setupPeriods() {
+            document.querySelectorAll(".period-btn").forEach(button => {
+                button.addEventListener("click", async () => {
+                    document.querySelectorAll(".period-btn").forEach(item => item.classList.remove("active"));
+                    button.classList.add("active");
+                    state.selectedPeriod = button.dataset.period;
+                    await loadChartAndQuote();
+                });
+            });
+        }
+
+        function setupSearch() {
+            let timer;
+            stockSearch.addEventListener("input", () => {
+                clearTimeout(timer);
+                const query = stockSearch.value.trim();
+                if (query.length < 2) {
+                    suggestions.innerHTML = "";
+                    return;
+                }
+
+                timer = setTimeout(async () => {
+                    try {
+                        const result = await fetchJson(`/api/stocks/search?q=${encodeURIComponent(query)}`);
+                        suggestions.innerHTML = result.results.map(item => `
+                            <button class="suggestion" type="button" data-symbol="${item.symbol}" data-name="${item.name}">
+                                ${item.name} <span class="subcopy">(${item.symbol})</span>
+                            </button>
+                        `).join("");
+                        suggestions.querySelectorAll(".suggestion").forEach(button => {
+                            button.addEventListener("click", async () => {
+                                await selectSymbol(button.dataset.symbol, button.dataset.name);
+                            });
+                        });
+                    } catch (error) {
+                        suggestions.innerHTML = "";
+                    }
+                }, 220);
+            });
+        }
+
+        function attachEvents() {
+            quantityInput.addEventListener("input", updateTradeEstimate);
+            document.getElementById("buyButton").addEventListener("click", () => submitTrade("BUY"));
+            document.getElementById("sellButton").addEventListener("click", () => submitTrade("SELL"));
+            document.getElementById("openChartTradeButton").addEventListener("click", () => {
+                updateChartTradeDisplay();
+                document.getElementById("chartTradeModal").classList.remove("hidden");
+            });
+            document.getElementById("closeChartTradeButton").addEventListener("click", () => {
+                document.getElementById("chartTradeModal").classList.add("hidden");
+            });
+            document.getElementById("chartModalBuyButton").addEventListener("click", async () => {
+                state.chartSelectedPrice = Number(document.getElementById("chartTradePrice").value || 0);
+                quantityInput.value = document.getElementById("chartTradeQty").value || 1;
+                updateTradeEstimate();
+                await submitTrade("BUY");
+                document.getElementById("chartTradeModal").classList.add("hidden");
+            });
+            document.getElementById("chartModalSellButton").addEventListener("click", async () => {
+                state.chartSelectedPrice = Number(document.getElementById("chartTradePrice").value || 0);
+                quantityInput.value = document.getElementById("chartTradeQty").value || 1;
+                updateTradeEstimate();
+                await submitTrade("SELL");
+                document.getElementById("chartTradeModal").classList.add("hidden");
+            });
+            optionUnderlying.addEventListener("change", loadOptionChain);
+            optionType.addEventListener("change", syncOptionPremium);
+            optionStrike.addEventListener("change", syncOptionPremium);
+            optionLots.addEventListener("input", syncOptionPremium);
+            optionPremium.addEventListener("input", syncOptionPremium);
+            document.getElementById("buyOptionButton").addEventListener("click", () => submitOptionTrade("BUY"));
+            document.getElementById("sellOptionButton").addEventListener("click", () => submitOptionTrade("SELL"));
+            document.getElementById("authForm").addEventListener("submit", handleAuthSubmit);
+            document.getElementById("logoutButton").addEventListener("click", logout);
+            document.getElementById("resetButton").addEventListener("click", resetAccount);
+            setupAuthTabs();
+            setupPeriods();
+            setupSearch();
+        }
+
+        async function bootstrap() {
+            renderWallet();
+            renderHoldings();
+            renderTrades();
+            renderOptions();
+            renderWatchlist();
+            attachEvents();
+            await refreshWatchlistQuotes();
+            await checkAuth();
+            await loadOptionChain();
+            await selectSymbol(state.selectedSymbol, state.selectedName);
+            setInterval(refreshWatchlistQuotes, 30000);
+        }
+
+        bootstrap();
+    </script>
+</body>
+</html>

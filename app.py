@@ -1,11 +1,30 @@
-from flask import Flask, render_template, request, jsonify
+from functools import wraps
+
+from flask import Flask, render_template, request, jsonify, session
 import yfinance as yf
 import pandas as pd
 import requests
 import difflib
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from models import db, User, Trade, OptionTrade
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "paper-trading-secret-key")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(app.root_path, 'paper_trading.db')}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
+INITIAL_PAPER_BALANCE = 100000.0
+OPTION_UNDERLYINGS = {
+    "NIFTY": {"symbol": "^NSEI", "step": 50, "lot_size": 75, "fallback_spot": 22350},
+    "BANKNIFTY": {"symbol": "^NSEBANK", "step": 100, "lot_size": 30, "fallback_spot": 48400}
+}
 
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "cb5588210c094009b4b4879bed6be892")
 
@@ -581,6 +600,266 @@ def resolve_symbol(user_input):
                 return candidate
 
     return cleaned_input
+
+
+def get_logged_in_user():
+    user_id = session.get("user_id")
+    if not user_id:
+        return None
+    return db.session.get(User, user_id)
+
+
+def login_required_json(view_func):
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        user = get_logged_in_user()
+        if not user:
+            return jsonify({
+                "success": False,
+                "error": "Please log in to continue."
+            }), 401
+        return view_func(user, *args, **kwargs)
+
+    return wrapped
+
+
+def get_live_quote(symbol_input):
+    resolved_symbol = resolve_symbol(symbol_input)
+    result = build_stock_payload(resolved_symbol, "1d", original_input=symbol_input)
+
+    if not result.get("success"):
+        raise ValueError(result.get("error_message") or "Unable to fetch live price.")
+
+    data = result["data"]
+    return {
+        "symbol": data["symbol"],
+        "name": data.get("name") or data["symbol"],
+        "price": safe_float(data.get("price"), 0),
+        "change": safe_float(data.get("change"), 0),
+        "percent": safe_float(data.get("percent"), 0)
+    }
+
+
+def build_holdings_snapshot(user_id):
+    trades = Trade.query.filter_by(user_id=user_id).order_by(Trade.created_at.asc(), Trade.id.asc()).all()
+    holdings = {}
+    realized_pnl = 0.0
+
+    for trade in trades:
+        entry = holdings.setdefault(trade.symbol, {
+            "symbol": trade.symbol,
+            "company_name": trade.company_name,
+            "quantity": 0,
+            "average_price": 0.0
+        })
+
+        if trade.trade_type == "BUY":
+            running_cost = (entry["average_price"] * entry["quantity"]) + (trade.price * trade.quantity)
+            entry["quantity"] += trade.quantity
+            entry["average_price"] = running_cost / entry["quantity"] if entry["quantity"] else 0.0
+        elif trade.trade_type == "SELL":
+            sold_quantity = min(entry["quantity"], trade.quantity)
+            realized_pnl += (trade.price - entry["average_price"]) * sold_quantity
+            entry["quantity"] = max(0, entry["quantity"] - trade.quantity)
+            if entry["quantity"] == 0:
+                entry["average_price"] = 0.0
+
+    active_holdings = [item for item in holdings.values() if item["quantity"] > 0]
+    return active_holdings, round(realized_pnl, 2)
+
+
+def build_portfolio_response(user):
+    holdings, realized_pnl = build_holdings_snapshot(user.id)
+    open_value = 0.0
+    unrealized_pnl = 0.0
+    holdings_payload = []
+
+    for item in holdings:
+        try:
+            quote = get_live_quote(item["symbol"])
+            current_price = quote["price"]
+            company_name = quote["name"]
+        except Exception:
+            current_price = item["average_price"]
+            company_name = item["company_name"]
+
+        market_value = current_price * item["quantity"]
+        investment = item["average_price"] * item["quantity"]
+        pnl = market_value - investment
+
+        open_value += market_value
+        unrealized_pnl += pnl
+
+        holdings_payload.append({
+            "symbol": item["symbol"],
+            "company_name": company_name,
+            "quantity": item["quantity"],
+            "average_price": round(item["average_price"], 2),
+            "current_price": round(current_price, 2),
+            "market_value": round(market_value, 2),
+            "pnl": round(pnl, 2)
+        })
+
+    trades = Trade.query.filter_by(user_id=user.id).order_by(Trade.created_at.desc(), Trade.id.desc()).limit(20).all()
+    trades_payload = [{
+        "id": trade.id,
+        "symbol": trade.symbol,
+        "company_name": trade.company_name,
+        "type": trade.trade_type,
+        "quantity": trade.quantity,
+        "price": round(trade.price, 2),
+        "total": round(trade.price * trade.quantity, 2),
+        "created_at": trade.created_at.isoformat()
+    } for trade in trades]
+
+    return {
+        "user": {
+            "id": user.id,
+            "username": user.username
+        },
+        "wallet": {
+            "starting_balance": round(INITIAL_PAPER_BALANCE, 2),
+            "balance": round(user.balance, 2),
+            "holdings_value": round(open_value, 2),
+            "total_equity": round(user.balance + open_value, 2),
+            "realized_pnl": round(realized_pnl, 2),
+            "unrealized_pnl": round(unrealized_pnl, 2)
+        },
+        "holdings": holdings_payload,
+        "trades": trades_payload
+    }
+
+
+def get_upcoming_expiries(limit=4):
+    expiries = []
+    current = pd.Timestamp.utcnow().tz_localize(None)
+    date = current
+    while len(expiries) < limit:
+        if date.weekday() == 3:
+            expiries.append(date.strftime("%Y-%m-%d"))
+        date += pd.Timedelta(days=1)
+    return expiries
+
+
+def calculate_option_premium(spot, strike, option_type, days_left, step):
+    intrinsic = max(spot - strike, 0) if option_type == "CE" else max(strike - spot, 0)
+    distance = abs(spot - strike)
+    time_value = max(spot * 0.003, 8) * (((days_left + 1) / 7) ** 0.5)
+    decay = max(0.22, 1 - (distance / max(step * 8, 1)))
+    premium = intrinsic + (time_value * decay)
+    return round(max(premium, 1.0), 2)
+
+
+def build_option_chain(underlying):
+    config = OPTION_UNDERLYINGS.get(underlying)
+    if not config:
+        raise ValueError("Unsupported underlying.")
+
+    try:
+        quote = get_live_quote(config["symbol"])
+        spot = quote["price"]
+    except Exception:
+        spot = config["fallback_spot"]
+
+    expiries = get_upcoming_expiries()
+    atm = round(spot / config["step"]) * config["step"]
+    rows = []
+    for offset in range(-5, 6):
+        strike = atm + (offset * config["step"])
+        rows.append({
+            "strike": strike,
+            "ce_price": calculate_option_premium(spot, strike, "CE", 7, config["step"]),
+            "pe_price": calculate_option_premium(spot, strike, "PE", 7, config["step"])
+        })
+
+    return {
+        "underlying": underlying,
+        "spot": round(spot, 2),
+        "lot_size": config["lot_size"],
+        "step": config["step"],
+        "expiries": expiries,
+        "chain": rows
+    }
+
+
+def build_option_positions_snapshot(user_id):
+    trades = OptionTrade.query.filter_by(user_id=user_id).order_by(OptionTrade.created_at.asc(), OptionTrade.id.asc()).all()
+    positions = {}
+    realized_pnl = 0.0
+
+    for trade in trades:
+        key = (trade.contract_symbol, trade.expiry)
+        entry = positions.setdefault(key, {
+            "underlying": trade.underlying,
+            "contract_symbol": trade.contract_symbol,
+            "option_type": trade.option_type,
+            "strike_price": trade.strike_price,
+            "expiry": trade.expiry,
+            "quantity": 0,
+            "average_price": 0.0
+        })
+
+        if trade.trade_type == "BUY":
+            running_cost = (entry["average_price"] * entry["quantity"]) + (trade.price * trade.quantity)
+            entry["quantity"] += trade.quantity
+            entry["average_price"] = running_cost / entry["quantity"] if entry["quantity"] else 0.0
+        elif trade.trade_type == "SELL":
+            sold_quantity = min(entry["quantity"], trade.quantity)
+            realized_pnl += (trade.price - entry["average_price"]) * sold_quantity
+            entry["quantity"] = max(0, entry["quantity"] - trade.quantity)
+            if entry["quantity"] == 0:
+                entry["average_price"] = 0.0
+
+    active_positions = [item for item in positions.values() if item["quantity"] > 0]
+    return active_positions, round(realized_pnl, 2)
+
+
+def build_options_response(user):
+    positions, realized_pnl = build_option_positions_snapshot(user.id)
+    payload = []
+    unrealized_pnl = 0.0
+
+    for position in positions:
+        chain = build_option_chain(position["underlying"])
+        row = next((item for item in chain["chain"] if item["strike"] == position["strike_price"]), None)
+        current_price = row["ce_price"] if position["option_type"] == "CE" else row["pe_price"] if row else position["average_price"]
+        pnl = (current_price - position["average_price"]) * position["quantity"]
+        unrealized_pnl += pnl
+        payload.append({
+            "underlying": position["underlying"],
+            "contract_symbol": position["contract_symbol"],
+            "option_type": position["option_type"],
+            "strike_price": position["strike_price"],
+            "expiry": position["expiry"],
+            "quantity": position["quantity"],
+            "average_price": round(position["average_price"], 2),
+            "current_price": round(current_price, 2),
+            "pnl": round(pnl, 2)
+        })
+
+    recent_trades = OptionTrade.query.filter_by(user_id=user.id).order_by(OptionTrade.created_at.desc(), OptionTrade.id.desc()).limit(20).all()
+    trades_payload = [{
+        "id": trade.id,
+        "underlying": trade.underlying,
+        "contract_symbol": trade.contract_symbol,
+        "option_type": trade.option_type,
+        "strike_price": trade.strike_price,
+        "expiry": trade.expiry,
+        "type": trade.trade_type,
+        "quantity": trade.quantity,
+        "price": round(trade.price, 2),
+        "total": round(trade.price * trade.quantity, 2),
+        "created_at": trade.created_at.isoformat()
+    } for trade in recent_trades]
+
+    return {
+        "positions": payload,
+        "trades": trades_payload,
+        "summary": {
+            "realized_pnl": round(realized_pnl, 2),
+            "unrealized_pnl": round(unrealized_pnl, 2)
+        }
+    }
 
 
 def calculate_rsi(series, period=14):
@@ -2001,6 +2280,327 @@ def contact():
 @app.route("/strategies")
 def strategies():
     return render_template("strategies.html", strategies=STRATEGY_LIBRARY)
+
+
+@app.route("/api/stocks/search")
+def stock_search():
+    query = request.args.get("q", "").strip()
+    suggestions = get_symbol_suggestions(query)
+    return jsonify({
+        "success": True,
+        "results": suggestions
+    })
+
+
+@app.route("/api/auth/status")
+def auth_status():
+    user = get_logged_in_user()
+    if not user:
+        return jsonify({
+            "success": True,
+            "authenticated": False
+        })
+
+    return jsonify({
+        "success": True,
+        "authenticated": True,
+        "user": {
+            "id": user.id,
+            "username": user.username
+        }
+    })
+
+
+@app.route("/api/auth/signup", methods=["POST"])
+def signup():
+    data = request.get_json(silent=True) or {}
+    username = str(data.get("username", "")).strip()
+    password = str(data.get("password", "")).strip()
+
+    if len(username) < 3 or len(password) < 4:
+        return jsonify({
+            "success": False,
+            "error": "Username must be 3+ chars and password must be 4+ chars."
+        }), 400
+
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return jsonify({
+            "success": False,
+            "error": "Username already exists."
+        }), 409
+
+    user = User(
+        username=username,
+        password=generate_password_hash(password),
+        balance=INITIAL_PAPER_BALANCE
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    session["user_id"] = user.id
+    return jsonify({
+        "success": True,
+        "message": "Account created successfully.",
+        "portfolio": build_portfolio_response(user),
+        "options": build_options_response(user)
+    })
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+    data = request.get_json(silent=True) or {}
+    username = str(data.get("username", "")).strip()
+    password = str(data.get("password", "")).strip()
+
+    user = User.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({
+            "success": False,
+            "error": "Invalid username or password."
+        }), 401
+
+    session["user_id"] = user.id
+    return jsonify({
+        "success": True,
+        "message": "Login successful.",
+        "portfolio": build_portfolio_response(user),
+        "options": build_options_response(user)
+    })
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    session.pop("user_id", None)
+    return jsonify({
+        "success": True,
+        "message": "Logged out successfully."
+    })
+
+
+@app.route("/paper-trading")
+def paper_trading():
+    return render_template("paper_trading.html")
+
+
+@app.route("/api/paper/account")
+@login_required_json
+def paper_account(user):
+    return jsonify({
+        "success": True,
+        "portfolio": build_portfolio_response(user),
+        "options": build_options_response(user)
+    })
+
+
+@app.route("/api/options/chain")
+def options_chain():
+    underlying = str(request.args.get("underlying", "NIFTY")).upper()
+    try:
+        return jsonify({
+            "success": True,
+            "chain": build_option_chain(underlying)
+        })
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc)
+        }), 400
+
+
+@app.route("/api/options/portfolio")
+@login_required_json
+def options_portfolio(user):
+    return jsonify({
+        "success": True,
+        "options": build_options_response(user)
+    })
+
+
+@app.route("/portfolio")
+@app.route("/api/paper/portfolio")
+@login_required_json
+def paper_portfolio(user):
+    portfolio = build_portfolio_response(user)
+    return jsonify({
+        "success": True,
+        "holdings": portfolio["holdings"],
+        "trades": portfolio["trades"],
+        "wallet": portfolio["wallet"],
+        "options": build_options_response(user)
+    })
+
+
+@app.route("/buy", methods=["POST"])
+@app.route("/sell", methods=["POST"])
+@app.route("/api/paper/trade", methods=["POST"])
+@login_required_json
+def paper_trade(user):
+    data = request.get_json(silent=True) or {}
+    forced_type = "BUY" if request.path == "/buy" else "SELL" if request.path == "/sell" else ""
+    trade_type = forced_type or str(data.get("type", "")).upper()
+    symbol_input = str(data.get("symbol", "")).strip()
+    try:
+        quantity = int(data.get("quantity", 0) or 0)
+    except (TypeError, ValueError):
+        quantity = 0
+
+    if trade_type not in {"BUY", "SELL"}:
+        return jsonify({
+            "success": False,
+            "error": "Trade type must be BUY or SELL."
+        }), 400
+
+    if not symbol_input:
+        return jsonify({
+            "success": False,
+            "error": "Stock symbol is required."
+        }), 400
+
+    if quantity <= 0:
+        return jsonify({
+            "success": False,
+            "error": "Quantity must be greater than zero."
+        }), 400
+
+    try:
+        quote = get_live_quote(symbol_input)
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "error": str(exc)
+        }), 400
+
+    manual_price = safe_float(data.get("price"), 0)
+    execution_price = round(manual_price, 2) if manual_price > 0 else round(quote["price"], 2)
+
+    total_value = round(execution_price * quantity, 2)
+
+    if trade_type == "BUY":
+        if user.balance < total_value:
+            return jsonify({
+                "success": False,
+                "error": "Insufficient balance."
+            }), 400
+        user.balance -= total_value
+    else:
+        holdings, _ = build_holdings_snapshot(user.id)
+        holding_map = {item["symbol"]: item for item in holdings}
+        current_holding = holding_map.get(quote["symbol"])
+        if not current_holding or current_holding["quantity"] < quantity:
+            return jsonify({
+                "success": False,
+                "error": "Insufficient holdings to sell."
+            }), 400
+        user.balance += total_value
+
+    trade = Trade(
+        user_id=user.id,
+        symbol=quote["symbol"],
+        company_name=quote["name"],
+        trade_type=trade_type,
+        quantity=quantity,
+        price=execution_price
+    )
+    db.session.add(trade)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": f"{trade_type} order executed for {quote['symbol']}.",
+        "trade": {
+            "symbol": quote["symbol"],
+            "company_name": quote["name"],
+            "type": trade_type,
+            "quantity": quantity,
+            "price": execution_price,
+            "total": total_value
+        },
+        "portfolio": build_portfolio_response(user)
+    })
+
+
+@app.route("/api/options/trade", methods=["POST"])
+@login_required_json
+def options_trade(user):
+    data = request.get_json(silent=True) or {}
+    underlying = str(data.get("underlying", "")).upper()
+    option_type = str(data.get("option_type", "")).upper()
+    expiry = str(data.get("expiry", "")).strip()
+    trade_type = str(data.get("type", "")).upper()
+    try:
+        strike_price = float(data.get("strike_price", 0) or 0)
+        quantity = int(data.get("quantity", 0) or 0)
+    except (TypeError, ValueError):
+        strike_price = 0
+        quantity = 0
+
+    if underlying not in OPTION_UNDERLYINGS:
+        return jsonify({"success": False, "error": "Unsupported underlying."}), 400
+    if option_type not in {"CE", "PE"}:
+        return jsonify({"success": False, "error": "Option type must be CE or PE."}), 400
+    if trade_type not in {"BUY", "SELL"}:
+        return jsonify({"success": False, "error": "Trade type must be BUY or SELL."}), 400
+    if strike_price <= 0 or quantity <= 0 or not expiry:
+        return jsonify({"success": False, "error": "Expiry, strike price, and quantity are required."}), 400
+
+    chain = build_option_chain(underlying)
+    row = next((item for item in chain["chain"] if item["strike"] == strike_price), None)
+    if not row:
+        return jsonify({"success": False, "error": "Selected strike is not available in chain."}), 400
+
+    market_price = row["ce_price"] if option_type == "CE" else row["pe_price"]
+    manual_price = safe_float(data.get("price"), 0)
+    execution_price = round(manual_price, 2) if manual_price > 0 else round(market_price, 2)
+    total_value = round(execution_price * quantity, 2)
+    contract_symbol = f"{underlying}-{expiry}-{int(strike_price)}-{option_type}"
+
+    if trade_type == "BUY":
+        if user.balance < total_value:
+            return jsonify({"success": False, "error": "Insufficient balance."}), 400
+        user.balance -= total_value
+    else:
+        positions, _ = build_option_positions_snapshot(user.id)
+        current_position = next((item for item in positions if item["contract_symbol"] == contract_symbol and item["expiry"] == expiry), None)
+        if not current_position or current_position["quantity"] < quantity:
+            return jsonify({"success": False, "error": "Insufficient option quantity to sell."}), 400
+        user.balance += total_value
+
+    option_trade = OptionTrade(
+        user_id=user.id,
+        underlying=underlying,
+        contract_symbol=contract_symbol,
+        option_type=option_type,
+        strike_price=strike_price,
+        expiry=expiry,
+        trade_type=trade_type,
+        quantity=quantity,
+        price=execution_price
+    )
+    db.session.add(option_trade)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": f"{trade_type} option order executed for {contract_symbol}.",
+        "options": build_options_response(user),
+        "portfolio": build_portfolio_response(user)
+    })
+
+
+@app.route("/api/paper/reset", methods=["POST"])
+@login_required_json
+def reset_paper_account(user):
+    Trade.query.filter_by(user_id=user.id).delete()
+    OptionTrade.query.filter_by(user_id=user.id).delete()
+    user.balance = INITIAL_PAPER_BALANCE
+    db.session.commit()
+    return jsonify({
+        "success": True,
+        "message": "Paper trading account reset.",
+        "portfolio": build_portfolio_response(user),
+        "options": build_options_response(user)
+    })
 
 @app.route("/live-data/<symbol>")
 def live_data(symbol):
